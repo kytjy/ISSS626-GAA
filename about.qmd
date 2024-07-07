@@ -1,9 +1,2 @@
----
-title: "About"
----
 
-About this site
-
-```{r}
-1 + 1
-```
+![](Images/about.PNG){fig-align="center" width="100%"}

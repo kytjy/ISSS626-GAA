@@ -2,18 +2,75 @@ project:
   type: website
 
 website:
-  title: "ISSS626-GAA"
+  title: "we could go anywhere"
+  image: "Images/Logo.png"
+  favicon: "Images/Icon.png"
+  page-navigation: true
   navbar:
-    left:
+    logo: "Images/logo.png"
+    title: false
+    collapse-below: lg
+    search: true
+    left: 
+      - text: "Hands-on Exercises"
+        menu: 
+          - text: 1/
+            href: Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html
+          - text: 2/
+            href: Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html
+          - text: 3/
+            href: Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html            
+          - text: 4/
+            href: Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04a.html
+          - text: 5/
+            href: Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05a.html
+          - text: 6/
+            href: Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html
+          - text: 7/
+            href: Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07a.html   
+          - text: 8/
+            href: Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08.html  
+          - text: 10/
+            href: Hands-on_Ex/Hands-on_Ex10/Hands-on_Ex10.html 
+            
+      - text: "In-class Exercises"
+        menu: 
+          - text: 1/
+            href: In-class_Ex/In-class_Ex01/In-class_Ex01.html
+          - text: 2/
+            href: In-class_Ex/In-class_Ex06/In-class_Ex06.html  
+
+
+      - text: "Take-home Exercises"
+        menu: 
+          - text: 1/
+            href: Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html    
+          - text: 2/
+            href: Take-Home_Ex/Take-Home_Ex02/Take-Home_Ex02.html  
+          - text: 3/
+            href: Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html  
+          - text: 4/
+            href: Take-Home_Ex/Take-Home_Ex04/Take-Home_Ex04.html              
+
+    right:
       - href: index.qmd
-        text: Home
-      - about.qmd
+        text: "{{< fa house size=lg >}}"
+      - href: about.qmd
+        text: "{{< fa paw size=lg >}}"
+
+      
 
 format:
   html:
-    theme: cosmo
-    css: styles.css
+    grid:
+      margin-width: 250px
     toc: true
+    toc_float: true
+    theme: 
+      - theme.scss
+    highlight-style: tango
+    code-copy: hover
+    code-overflow: wrap
+    css: styles.css
 
 editor: visual
-

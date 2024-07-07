@@ -1,1 +1,90 @@
 /* css styles */
+
+/* Navbar Logo */
+.navbar-brand > img {
+  max-height: 30px;
+}
+
+/* Custom callout boxes */
+
+.thunderbox {
+  padding: 1.5em 2.5em 1.5em 6.5em;
+  margin-bottom: 10px;
+  border: 1.5px dotted #c2a873;
+  border-radius: 10px;
+  font-size: 13px;
+  background: #f0e9cc 5px center/3em no-repeat;
+}
+
+.thunder {
+  background-image: url("Images/caution.png");
+  background-position: left;
+  background-position-x: 1rem;
+  background-position-y: 1rem;
+  background-size: auto 75px;  
+}
+
+.brainbox {
+  padding: 1.5em 2.5em 1.5em 6.5em;
+  margin-bottom: 10px;
+  border: 1.5px dotted #a8b298;
+  border-radius: 10px;
+  background: #dfedd9 5px center/3em no-repeat;
+}
+
+.brain {
+  background-image: url("Images/insights.png");
+  background-position: left;
+  background-position-x: 1rem;  
+  background-position-y: 1rem;
+  background-size: auto 65px;  
+}
+
+
+.chatterbox {
+  padding: 1.5em 2.5em 1.5em 6.5em;
+  margin-bottom: 10px;
+  border: 1.5px dotted #9ab8c4;
+  border-radius: 10px;
+  background:  #dee8ef  5px center/3em no-repeat;
+}
+
+.chatter {
+  background-image: url("Images/chatter.png");
+  background-position: left;
+  background-position-x: 1rem;
+  background-position-y: 1rem;
+  background-size: auto 70px;
+}
+
+.nursebox {
+  padding: 1.5em 2.5em 1.5em 6.5em;
+  margin-bottom: 10px;
+  border: 1.5px dotted #D7878A;
+  border-radius: 10px;
+  background:  #F4E7E7  5px center/3em no-repeat;
+}
+
+.nurse {
+  background-image: url("Images/help.png");
+  background-position: left;
+  background-position-x: 1rem;
+  background-position-y: 1rem;
+  background-size: auto 62px;
+}
+
+.pkbox {
+  padding: 1.5em 2.5em 1.5em 6.5em;
+  margin-bottom: 10px;
+  border: 1.5px dotted #dfb2e9;
+  border-radius: 10px;
+  background:  #ede3fe  5px center/3em no-repeat;
+}
+
+.pk {
+  background-image: url("Images/pk.png");
+  background-position: left;
+  background-position-x: 1rem;
+  background-position-y: 1rem;
+  background-size: auto 45px;
+}
