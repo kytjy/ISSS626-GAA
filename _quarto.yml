@@ -14,23 +14,33 @@ website:
     left: 
       - text: "Hands-on Exercises"
         menu: 
-          - text: 1/
-            href: Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html
-          - text: 2/
-            href: Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html
-          - text: 3/
-            href: Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03b.html            
-          - text: 4/
-            href: Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04a.html
-          - text: 5/
+          - text: 1a Geospatial Data Wrangling
+            href: Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01a.html
+          - text: 1b Choropleth Mapping
+            href: Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01b.html            
+          - text: 2a 1st Order Spatial Point Patterns Analysis Methods
+            href: Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02a.html
+          - text: 2b 2nd Order Spatial Point Patterns Analysis Methods
+            href: Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02b.html            
+          - text: 3 Network Constrained Spatial Point Patterns Analysis
+            href: Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html            
+          - text: 4 Spatial Weights and Applications
+            href: Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html
+          - text: 5a Global Measures of Spatial Autocorrelation
             href: Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05a.html
-          - text: 6/
+          - text: 5b Lobal Measures of Spatial Autocorrelation
+            href: Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05b.html            
+          - text: 6 Geographical Segmentation with Spatially Constrained Clustering Techniques
             href: Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html
-          - text: 7/
-            href: Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07a.html   
-          - text: 8/
-            href: Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08.html  
-          - text: 10/
+          - text: 7 Calibrating Hedonic Pricing Model
+            href: Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html   
+          - text: 8 Geographically Weighted Predictive Models
+            href: Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08.html 
+          - text: 9a Processing and Visualising Flow Data
+            href: Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09a.html 
+          - text: 9b Calibrating Spatial Interaction Models
+            href: Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09b.html            
+          - text: 10 Modelling Geographical Accessibility
             href: Hands-on_Ex/Hands-on_Ex10/Hands-on_Ex10.html 
             
       - text: "In-class Exercises"
@@ -38,7 +48,7 @@ website:
           - text: 1/
             href: In-class_Ex/In-class_Ex01/In-class_Ex01.html
           - text: 2/
-            href: In-class_Ex/In-class_Ex06/In-class_Ex06.html  
+            href: In-class_Ex/In-class_Ex06/In-class_Ex02.html  
 
 
       - text: "Take-home Exercises"
@@ -49,14 +59,12 @@ website:
             href: Take-Home_Ex/Take-Home_Ex02/Take-Home_Ex02.html  
           - text: 3/
             href: Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html  
-          - text: 4/
-            href: Take-Home_Ex/Take-Home_Ex04/Take-Home_Ex04.html              
 
     right:
       - href: index.qmd
         text: "{{< fa house size=lg >}}"
       - href: about.qmd
-        text: "{{< fa paw size=lg >}}"
+        text: "{{< fa at size=lg >}}"
 
       
 

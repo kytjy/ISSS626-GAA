@@ -1,17 +1,18 @@
 ---
 title: ""
 listing:
-  type: grid
-  max-items: 3
+  max-items: 5
+  type: default
   contents:
     - "Hands-on_Ex/*/*.qmd"
     - "Take-home_Ex/*/*.qmd"
     - "In-class_Ex/*/*.qmd"
-  sort: "date desc"
+  sort: 
+    - "date desc"
+    - "title desc"
 toc: false
-max-description-length: 40
 ---
 
 ![](Images/landing.PNG){fig-align="center" width="80%"}
 
-## Latest Posts:
+## Latest Posts
