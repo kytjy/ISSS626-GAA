@@ -109,11 +109,10 @@ cyclingpath = st_read(dsn = "data/geospatial",
 ```
 
 ::: {.lightbox .light data-latex="light"}
-**Interpretation** 
+**Interpretation**
 
--   3138 features and 2 fields in *cyclingpath* [linestring]{.underline} feature data 
+-   3138 features and 2 fields in *cyclingpath* [linestring]{.underline} feature data
 -   Projected CRS = ***svy21*** projected coordinates system
-
 :::
 
 ## 4.3 Import GIS data in kml format
@@ -125,12 +124,11 @@ preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
 ```
 
 ::: {.lightbox .light data-latex="light"}
-**Interpretation** 
+**Interpretation**
 
--   **preschool** = [point]{.underline} feature data frame 
+-   **preschool** = [point]{.underline} feature data frame
 -   2290 features and 2 fields
 -   Geodetic CRS = ***WGS84*** coordinates system
-
 :::
 
 # 5 Checking the Content of a Simple Feature Data Frame
@@ -210,9 +208,7 @@ Projected coordinate systems and geodetic data are needed due to the Earth's imp
 
 The coordinate systems map the Earth's spherical surface onto a two-dimensional Cartesian coordinate plane. Thus, projected coordinate systems are referred to as map projections.
 
-![](Images/SG_CRS.PNG){fig-align="center"}
-[*EPSG*](https://epsg.io/3414)
-
+![](Images/SG_CRS.PNG){fig-align="center"} [*EPSG*](https://epsg.io/3414)
 :::
 
 ## 7.1 Assigning EPSG code to a simple feature data frame
@@ -224,6 +220,7 @@ Below example shows the coordinate system of *mpsz* simple feature data frame by
 ```{r}
 st_crs(mpsz)
 ```
+
 ::: {.lightbox .light data-latex="light"}
 **Interpretation:**
 
@@ -250,7 +247,7 @@ Let us take *preschool* simple feature data frame as an example. The print below
 preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
 ```
 
-In this scenario, *st_set_crs()* is not appropriate and *st_transform()* of **sf** package should be used. This is because we need to reproject *preschool* from one coordinate system to another coordinate system mathematically. 
+In this scenario, *st_set_crs()* is not appropriate and *st_transform()* of **sf** package should be used. This is because we need to reproject *preschool* from one coordinate system to another coordinate system mathematically.
 
 The code chunk below performs the projection transformation:
 
@@ -259,10 +256,10 @@ preschool3414 <- st_transform(preschool,
                               crs = 3414)
 ```
 
-
 ```{r}
 head(preschool3414, n=5)
 ```
+
 ::: {.lightbox .light data-latex="light"}
 **Interpretation:**
 
@@ -293,7 +290,6 @@ list(listings)
 -   *listing* tibble data frame consists of 3,540 rows and 18 columns
 -   Includes latitude and longitude, note that these are in decimal degree format
 -   As a best guess, we will assume that the data is in **wgs84** Geographic Coordinate System
-
 :::
 
 ## 8.2 Creating a simple feature data frame from an aspatial data frame
@@ -327,7 +323,7 @@ glimpse(listings_sf)
 -   Displays content of *listing_sf*
 -   `geometry`: new column added
 -   `longitude` and `latitude` columns dropped from data frame
-::: 
+:::
 
 # 9 Geoprocessing with sf package
 
@@ -337,7 +333,7 @@ In this section, we will learn how to perform two commonly used geoprocessing fu
 
 ## 9.1 Buffering
 
-:::panel-tabset
+::: panel-tabset
 ## Scenario
 
 The authority is planning to upgrade the existing cycling path. To do so, they need to acquire 5 metres of reserved land on the both sides of the current cycling path. You are tasked to determine the extend of the land need to be acquired and their total area.
@@ -363,11 +359,9 @@ sum(buffer_cycling$AREA)
 ```
 :::
 
-
 ### 9.1.1 Line Segments
 
-:::panel-tabset
-
+::: panel-tabset
 ## nQuadSegs = 10
 
 ```{r}
@@ -384,7 +378,6 @@ buffer_cycling20$AREA <- st_area(buffer_cycling20)
 sum(buffer_cycling20$AREA)
 ```
 
-
 ## nQuadSegs = 30
 
 ```{r}
@@ -392,6 +385,7 @@ buffer_cycling <- st_buffer(cyclingpath, dist=5, nQuadSegs=30)
 buffer_cycling$AREA <- st_area(buffer_cycling)
 sum(buffer_cycling$AREA)
 ```
+
 ## nQuadSegs = 50
 
 ```{r}
@@ -411,8 +405,7 @@ sum(buffer_cycling500$AREA)
 
 ### 9.1.2 Distance
 
-:::panel-tabset
-
+::: panel-tabset
 ## Dist = 5
 
 ```{r}
@@ -436,14 +429,11 @@ buffer_cycling_d50 <- st_buffer(cyclingpath, dist=50, nQuadSegs=30)
 buffer_cycling_d50$AREA <- st_area(buffer_cycling_d50)
 sum(buffer_cycling_d50$AREA)
 ```
-
 :::
-
 
 ## 9.2 Point-in-polygon count
 
-:::panel-tabset
-
+::: panel-tabset
 ## Scenario
 
 A pre-school service group want to find out the numbers of pre-schools in each Planning Subzone.
@@ -473,7 +463,7 @@ top_n(mpsz3414, 1, `PreSch Count`)
 
 ## 9.3 Density
 
-:::panel-tabset
+::: panel-tabset
 ## Scenario
 
 Calculate the density of pre-school by planning subzone.
