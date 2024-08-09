@@ -25,7 +25,7 @@ format:
 
 In this hands-on exercise, we learn how to import, wrangle, integrate, and process geographically referenced data sets using appropriate R packages.
 
-# 2 Data Acquisition
+# 2 The Data
 
 +------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------+
 | Type       | Details                                                                                                                                                                  | Screenshot                                       |
@@ -33,7 +33,7 @@ In this hands-on exercise, we learn how to import, wrangle, integrate, and proce
 | Geospatial | [Master Plan 2014 Subzone Boundary Web](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9) | ![](images/MPSZ_SHP.PNG){width="600"}            |
 |            |                                                                                                                                                                          |                                                  |
 |            | *Source: data.gov.sg\                                                                                                                                                    |                                                  |
-|            | Format: SHP*                                                                                                                                                             |                                                  |
+|            | Format: SHP (ESRI Shapefile)*                                                                                                                                            |                                                  |
 +------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------+
 | Geospatial | [Pre-Schools Location](https://beta.data.gov.sg/datasets?query=Pre-Schools+Location&resultId=d_a72bcd23e208d995f3bd4eececeaca43)                                         | ![](images/Pre-Schools_Loc_KML.PNG){width="600"} |
 |            |                                                                                                                                                                          |                                                  |
@@ -53,21 +53,21 @@ In this hands-on exercise, we learn how to import, wrangle, integrate, and proce
 
 : Data Sources {tbl-colwidths="\[10,20,70\]"}
 
-# 3 Loading Packages
+Unzip these downloads and save them into *geospatial* and *aspatial* sub-folders of the *data* folder.
 
-+-----------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Package                                 | Description                                                                                                                                                                                                                              |
-+=========================================+==========================================================================================================================================================================================================================================+
-| [tidyverse](https://www.tidyverse.org/) | A collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data.                                                                                                              |
-|                                         |                                                                                                                                                                                                                                          |
-|                                         | Within **tidyverse**, we will explore the use of **readr** for importing csv files, **readxl** for importing Excel worksheets, **tidyr** for manipulating data, **dplyr** for data transformation, and **ggplot2** for visualising data. |
-+-----------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [sf](https://r-spatial.github.io/sf/)   | For importing, managing, and processing geospatial data.                                                                                                                                                                                 |
-+-----------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+# 3 The Packages
+
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Package                                     | Description                                                                                                                                                                                                                              |
++=============================================+==========================================================================================================================================================================================================================================+
+| [**tidyverse**](https://www.tidyverse.org/) | A collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data.                                                                                                              |
+|                                             |                                                                                                                                                                                                                                          |
+|                                             | Within **tidyverse**, we will explore the use of **readr** for importing csv files, **readxl** for importing Excel worksheets, **tidyr** for manipulating data, **dplyr** for data transformation, and **ggplot2** for visualising data. |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**sf**](https://r-spatial.github.io/sf/)   | For importing, managing, and processing geospatial data.                                                                                                                                                                                 |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : {tbl-colwidths="\[10,90\]"}
-
-Unzip these downloads and save them into *geospatial* and *aspatial* sub-folders of the *data* folder.
 
 The code chunk below installs and loads **sf** and **tidyverse** packages into R environment using `p_load` from the **pacman** package.
 
@@ -82,7 +82,7 @@ pacman::p_load(sf, tidyverse)
 The code chunk below uses `st_read()` function of sf package:
 
 -   read simple features form file/database, or retrieve layer names and their geometry types(s)
--   imports `MP14_SUBZONE_WEB_PL` shapefile into R as [polygon]{.underline} feature data frame
+-   imports **MP14_SUBZONE_WEB_PL** shapefile into R as [polygon]{.underline} feature data frame
 -   `dsn` = defines data path; `layer` = provide the shapefile name
 
 ```{r}
@@ -291,6 +291,20 @@ list(listings)
 -   Includes latitude and longitude, note that these are in decimal degree format
 -   As a best guess, we will assume that the data is in **wgs84** Geographic Coordinate System
 :::
+
+```{r}
+#| echo: false
+# Setting theme
+theme_gtsummary_compact()
+
+listings %>% 
+  select(5, 6, 9:17) %>%
+  tbl_summary(missing_text = "NA") %>% 
+  add_n() %>% 
+  modify_caption("**Table of Variable Summary**") %>%
+  bold_labels()
+```
+
 
 ## 8.2 Creating a simple feature data frame from an aspatial data frame
 
