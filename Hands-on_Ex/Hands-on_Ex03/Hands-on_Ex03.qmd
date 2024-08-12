@@ -60,17 +60,17 @@ In this study, we will analyse the spatial distribution of childcare centre in [
 
 In this hands-on exercise, four R packages will be used, they are:
 
-+-------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Package                                                                       | Description                                                                                                                                                                                                                                                                                                                         |
-+===============================================================================+=====================================================================================================================================================================================================================================================================================================================================+
-| [**sf**](https://r-spatial.github.io/sf/)                                     | Provides functions to manage, processing, and manipulate **Simple Features**, a formal geospatial data standard that specifies a storage and access model of spatial geometries such as points, lines, and polygons.                                                                                                                |
-+-------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**spNetwork**](https://cran.r-project.org/web/packages/spNetwork/index.html) | Provides functions to perform Spatial Point Patterns Analysis such as kernel density estimation (KDE) and K-function on network. It also can be used to build spatial matrices (\'listw\' objects like in **spdep** package) to conduct any kind of traditional spatial analysis with spatial weights based on reticular distances. |
-+-------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**tidyverse**](https://www.tidyverse.org/)                                   | A collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data.                                                                                                                                                                                                         |
-+-------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**tmap**](https://cran.r-project.org/web/packages/tmap/)                     | For thematic mapping; provides functions for plotting cartographic quality static point patterns maps or interactive maps by using [leaflet](https://leafletjs.com/) API                                                                                                                                                            |
-+-------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++-------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Package                                                                       | Description                                                                                                                                                                                                                                                                                                                       |
++===============================================================================+===================================================================================================================================================================================================================================================================================================================================+
+| [**sf**](https://r-spatial.github.io/sf/)                                     | Provides functions to manage, processing, and manipulate **Simple Features**, a formal geospatial data standard that specifies a storage and access model of spatial geometries such as points, lines, and polygons.                                                                                                              |
++-------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**spNetwork**](https://cran.r-project.org/web/packages/spNetwork/index.html) | Provides functions to perform Spatial Point Patterns Analysis such as kernel density estimation (KDE) and K-function on network. It also can be used to build spatial matrices ('listw' objects like in **spdep** package) to conduct any kind of traditional spatial analysis with spatial weights based on reticular distances. |
++-------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**tidyverse**](https://www.tidyverse.org/)                                   | A collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data.                                                                                                                                                                                                       |
++-------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**tmap**](https://cran.r-project.org/web/packages/tmap/)                     | For thematic mapping; provides functions for plotting cartographic quality static point patterns maps or interactive maps by using [leaflet](https://leafletjs.com/) API                                                                                                                                                          |
++-------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : {tbl-colwidths="\[15,85\]"}
 
@@ -86,8 +86,6 @@ install.packages("rgdal", repos = "https://packagemanager.posit.co/cran/2023-10-
 ```{r}
 pacman::p_load(sf, spNetwork, tmap, tidyverse)
 ```
-
-
 :::
 
 # 4 Import Data and Preparation
@@ -105,15 +103,16 @@ network <- st_read(dsn="data/geospatial",
 childcare <- st_read(dsn="data/geospatial",
                      layer="Punggol_CC")
 ```
+
 ## 4.2 Checking Contents
 
-:::panel-tabset
-
+::: panel-tabset
 ## Network
 
 ```{r}
 network
 ```
+
 ```{r}
 str(network)
 ```
@@ -135,13 +134,11 @@ str(childcare)
 ```{r}
 st_crs(childcare)
 ```
-
 :::
 
 # 5 Visualising Geospatial data
 
-:::panel-tabset
-
+::: panel-tabset
 ## Using Plot
 
 ```{r}
@@ -154,7 +151,6 @@ plot(childcare,
      col='#800200',
      pch = 19)
 ```
-
 
 ```{r}
 par(bg = '#E4D5C9')
@@ -180,7 +176,6 @@ tm_shape(childcare) +
   tm_lines()
 
 ```
-
 :::
 
 ```{r}
@@ -195,8 +190,7 @@ tmap_mode('plot')
 
 Prior to computing NetKDE, it is necessary to partition the SpatialLines object into lixels with a specified minimum distance. This operation can be accomplished using the `lixelize_lines()` function from the **spNetwork** package.
 
-:::panel-tabset
-
+::: panel-tabset
 ## Lixel Length 700
 
 ```{r}
@@ -212,29 +206,31 @@ lixels_750 <- lixelize_lines(lines = network, #<< SpatialLinesDataFrame
                          lx_length = 750, #<< Length of a lixel
                          mindist = 375) #<< Minimum length of a lixel
 ```
-
 :::
 
 ::: {.notebox .note data-latex="note"}
-
 **Lixelize_lines Function**
 
 -   Dimensions for Lixels Objects:
-     -   Set the length of a lixel (*lx_length*) to 700m.
-     -   Set the minimum length of a lixel (*mindist*) to 350m.
-     
-     -   After cut, if the final lixel is shorter than the minimum distance, it will be added to the previous lixel.
-     -   Segments that are already shorter than the minimum length are not modified.
-     -   If the minimum length is NULL, then mindist = maxdist/10.
-     -   Additional Information about `Lixelize_lines` Function:
-     -   `Lixelize_lines` is used to cut a SpatialLines object into lixels with a specified minimal distance.
-     -   The function also supports multicore processing through `lixelize_lines.mc()`.
-     
+    -   Set the length of a lixel (*lx_length*) to 700m.
+
+    -   Set the minimum length of a lixel (*mindist*) to 350m.
+
+    -   After cut, if the final lixel is shorter than the minimum distance, it will be added to the previous lixel.
+
+    -   Segments that are already shorter than the minimum length are not modified.
+
+    -   If the minimum length is NULL, then mindist = maxdist/10.
+
+    -   Additional Information about `Lixelize_lines` Function:
+
+    -   `Lixelize_lines` is used to cut a SpatialLines object into lixels with a specified minimal distance.
+
+    -   The function also supports multicore processing through `lixelize_lines.mc()`.
 -   Post-cut Considerations:
     -   After cutting, if the length of the final lixel is shorter than the minimum distance, it is added to the previous lixel.
     -   If the minimum distance is NULL, then mindist is set to maxdist/10.
     -   Segments that are already shorter than the minimum distance are not modified.
-    
 :::
 
 ## 6.2 Generate line centre points using lines_center() of spNetwork
@@ -243,8 +239,7 @@ lixels_750 <- lixelize_lines(lines = network, #<< SpatialLinesDataFrame
 
 -   **Points are located at center of line** based on the length of the line.
 
-:::panel-tabset
-
+::: panel-tabset
 ## Lixel Length 700
 
 ```{r}
@@ -258,13 +253,11 @@ samples_750 <- lines_center(lixels_750)
 ```
 :::
 
-
 ## 6.3 Performing NetKDE
 
 To compute the NetKDE:
 
-:::panel-tabset
-
+::: panel-tabset
 ## Lixel Length 700
 
 ```{r}
@@ -304,12 +297,9 @@ densities_750 <- nkde(network,
                   sparse = TRUE,
                   verbose = FALSE)
 ```
-
 :::
 
-
 ::: {.notebox .note data-latex="note"}
-
 **Kernel Method and Arguments:**
 
 -   The code chunk reveals the use of the quartic kernel (kernel_name argument).
@@ -323,9 +313,9 @@ densities_750 <- nkde(network,
 -   spNetwork offers three methods for NKDE:
 
     -   **simple:** Distances between events and sampling points are replaced by network distances. The kernel formula is adjusted to calculate density over a linear unit instead of an areal unit.
-    
+
     -   **discontinuous:** Proposed by Okabe et al. (2008), this method "divides" the mass density of an event at intersections of lixels.
-    
+
     -   **continuous:** An alternative version proposed by Okabe et al. (2008) adjusts the density before intersections, making the function continuous.
 
 **User Guide Reference:**
@@ -341,15 +331,13 @@ densities_750 <- nkde(network,
 -   The selected method for NKDE calculation is "simple," and the reasons for its use are explained.
 
 -   Other supported methods include "discontinuous" and "continuous," each with specific characteristics described in the code chunk.
-
 :::
 
 ## 6.4 Visualising NetKDE
 
 ### 6.4.1 Insert computed density values (i.e. densities) into samples and lixels objects as density field
 
-:::panel-tabset
-
+::: panel-tabset
 ## Lixel Length 700
 
 ```{r}
@@ -363,17 +351,13 @@ lixels$density <- densities
 samples$density_750 <- densities_750
 lixels$density_750 <- densities_750
 ```
-
 :::
-
-
 
 ### 6.4.2 Rescale density values from number of events per m to number of events per km
 
 As the svy21 projection system is in meters, the resulting density values are very small (e.g., 0.0000005). The code below employed to rescale the density values from the number of events per meter to the number of events per km.
 
-:::panel-tabset
-
+::: panel-tabset
 ## Lixel Length 700
 
 ```{r}
@@ -389,17 +373,15 @@ lixels$density <- lixels$density*1000
 samples$density_750 <- samples$density_750*1000
 lixels$density_750 <- lixels$density_750*1000
 ```
-
-
 :::
-`
+
+\`
 
 ### 6.4.3 Using tmap package to plot map after rescaling
 
 **tmap** packages can be used to prepare interactive and high cartographic quality map visualisation.
 
-:::panel-tabset
-
+::: panel-tabset
 ## Lixel Length 700
 
 ```{r}
@@ -412,16 +394,13 @@ tm_shape(childcare)+
 
 ## Lixel Length 750
 
-
 ```{r}
 tm_shape(lixels)+
   tm_lines(col="density_750")+
 tm_shape(childcare)+
   tm_dots()
 ```
-
 :::
-
 
 ```{r}
 #| echo: false
@@ -429,23 +408,20 @@ tmap_mode('plot')
 ```
 
 ::: {.lightbox .light data-latex="light"}
-
 **Interpretation**
 
 -   Road segments with relatively higher density of childcare centres (darker color)
 -   Road segments with relatively lower density of childcare centres (lighter color)
-
 :::
 
 # 7 Network Constrained G- and K-Function Analysis
 
-:::panel-tabset
-
+::: panel-tabset
 ## Complete Spatial Randomness (CSR) Test
 
 -   **Objective**: Conducting CSR test using the `kfunctions()` function from the **spNetwork** package.
 
--   **Null Hypothesis ($H_0$)**: The observed spatial point events (i.e., distribution of childcare centres) exhibit a uniform distribution over a street network in Punggol Planning Area.
+-   **Null Hypothesis (**$H_0$): The observed spatial point events (i.e., distribution of childcare centres) exhibit a uniform distribution over a street network in Punggol Planning Area.
 
 -   **CSR Test Assumption**:
 
@@ -479,11 +455,9 @@ kfun_childcare <- kfunctions(network,
                              verbose = FALSE, 
                              conf_int = 0.05)
 ```
-
 :::
 
 ::: {.lightbox .light data-latex="light"}
-
 **Insights**
 
 ***Arguments Used:***
@@ -505,10 +479,11 @@ kfun_childcare <- kfunctions(network,
 
 The function outputs a list with the following components:
 
-    -   plotkA: ggplot2 object representing k-function values.
-    -   plotgA: ggplot2 object representing g-function values.
-    -   valuesA: DataFrame with values used to build the plots.
-
+```         
+-   plotkA: ggplot2 object representing k-function values.
+-   plotgA: ggplot2 object representing g-function values.
+-   valuesA: DataFrame with values used to build the plots.
+```
 :::
 
 We can visualise the ggplot2 object of k-function by using the code chunk below.
@@ -524,9 +499,7 @@ kfun_childcare$plotk +
         )
 ```
 
-
 ::: {.lightbox .light data-latex="light"}
-
 **Observations from the Graph:**
 
 -   The blue line indicates the empirical network K-function for childcare centers in Punggol.
@@ -539,7 +512,6 @@ kfun_childcare$plotk +
 **Conclusion:**
 
 -   Implies that childcare centers in Punggol exhibit a regular pattern within the *125m-687.5m* distance range.
-
 :::
 
 Kfunctions values:
@@ -551,3 +523,7 @@ DT::datatable(kfun_childcare$values,
               class = "compact",
               options = list(pageLength = 5, dom = 'tip'))
 ```
+
+# 8 Reference
+
+Kam, T. S. Network Constrained Spatial Point Patterns. *R for Geospatial Data Science and Analytics*. [https://r4gdsa.netlify.app/chap07.html](#0)
