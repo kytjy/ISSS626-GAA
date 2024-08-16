@@ -40,3 +40,18 @@
   background-size: auto 75px;  
 }
 
+.sherbox {
+  padding: 1.5em 3.5em 1.5em 8em;
+  margin-bottom: 10px;
+  border: 1.5px dotted #322D29;
+  border-radius: 10px;
+  background: #Ac9C8D 5px center/3em no-repeat;
+}
+
+.sherlock {
+  background-image: url("Images/sherlock.png");
+  background-position: left;
+  background-position-x: 1rem;  
+  background-position-y: 1rem;
+  background-size: auto 75px;  
+}
