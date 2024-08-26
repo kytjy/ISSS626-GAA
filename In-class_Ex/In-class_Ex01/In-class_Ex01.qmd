@@ -1,0 +1,115 @@
+---
+title: "In-class Exercise 1: WIP"
+title-block-banner: true
+date: "26-Aug-24"
+date-modified: "last-modified"
+toc: true
+toc-depth: 4
+editor: visual
+execute: 
+  freeze: true #never re-render during project render
+  echo: true #if false, displays charts without codes
+  eval: true #if false, displays codes without charts
+  warning: false #dont display if there are any warnings
+format: 
+  html:
+    code-fold: false
+    code-overflow: scroll
+    code-summary: "Show the code"
+    code-line-numbers: false
+---
+
+![](images/placeholder.PNG){fig-align="center"}
+
+# 1 Overview
+
+WIP~~~~~
+
+# 2 The Packages
+
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Package                                     | Description                                                                                                                                                                                                                              |
++=============================================+==========================================================================================================================================================================================================================================+
+| [**tidyverse**](https://www.tidyverse.org/) | A collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data.                                                                                                              |
+|                                             |                                                                                                                                                                                                                                          |
+|                                             | Within **tidyverse**, we will explore the use of **readr** for importing csv files, **readxl** for importing Excel worksheets, **tidyr** for manipulating data, **dplyr** for data transformation, and **ggplot2** for visualising data. |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**sf**](https://r-spatial.github.io/sf/)   | For importing, managing, and processing geospatial data.                                                                                                                                                                                 |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: {tbl-colwidths="\[10,90\]"}
+
+The code chunk below installs and loads **sf** and **tidyverse** packages into R environment using `p_load` from the **pacman** package.
+
+```{r}
+pacman::p_load(sf, tidyverse)
+```
+
+
+# 3 The Data
+
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Type       | Details                                                                                                                                                                  |
++============+==========================================================================================================================================================================+
+| Geospatial | [Master Plan 2014 Subzone Boundary Web](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9) |
+|            |                                                                                                                                                                          |
+|            | *Source: data.gov.sg\                                                                                                                                                    |
+|            | Format: SHP (ESRI Shapefile)*                                                                                                                                            |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Geospatial | [Pre-Schools Location](https://beta.data.gov.sg/datasets?query=Pre-Schools+Location&resultId=d_a72bcd23e208d995f3bd4eececeaca43)                                         |
+|            |                                                                                                                                                                          |
+|            | *Source: data.gov.sg\                                                                                                                                                    |
+|            | Format: KML*                                                                                                                                                             |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Geospatial | [Cycling Path](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)                                                                                         |
+|            |                                                                                                                                                                          |
+|            | *Source: LTA Data Mall\                                                                                                                                                  |
+|            | Format: SHP*                                                                                                                                                             |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Aspatial   | [Singapore AirBnB Listing](https://insideairbnb.com/get-the-data/)                                                                                                       |
+|            |                                                                                                                                                                          |
+|            | Source: Inside AirBnB\                                                                                                                                                   |
+|            | Format: CSV                                                                                                                                                              |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: Data Sources {tbl-colwidths="\[10,20,70\]"}
+
+Unzip these downloads and save them into *geospatial* and *aspatial* sub-folders of the *data* folder.
+
+# 4 Importing Geospatial Data
+
+## 4.1 Import polygon feature data in shapefile format
+
+The code chunk below uses `st_read()` function of sf package:
+
+-   read simple features form file/database, or retrieve layer names and their geometry types(s)
+-   imports **MPSZ-2019** shapefile into R as [polygon]{.underline} feature data frame
+-   `dsn` = defines data path; `layer` = provide the shapefile name
+
+```{r}
+mpsz = st_read(dsn = "data/geospatial", 
+                  layer = "MPSZ-2019")
+```
+
+::: {.lightbox .light data-latex="light"}
+**Interpretation**
+
+-   Geometry type = [**multipolygon**]{.underline} features
+-   332 multipolygon features and 6 fields in simple feature data frame
+-   Geodetic CRS = ***WGS84*** coordinates system
+-   Bounding box provides x extend and y extend of the data
+:::
+
+## 4.3 Import GIS data in kml format
+
+```{r}
+#preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
+```
+
+::: {.lightbox .light data-latex="light"}
+**Interpretation**
+
+-   **preschool** = [point]{.underline} feature data frame
+-   2290 features and 2 fields
+-   Geodetic CRS = ***WGS84*** coordinates system
+:::

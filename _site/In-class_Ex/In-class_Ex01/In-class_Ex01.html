@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2024-08-26">
 
-<title>we could go anywhere -</title>
+<title>we could go anywhere - In-class Exercise 1: WIP</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,30 +21,62 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./Images/Icon.png" rel="icon" type="image/png">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
-<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Images/Icon.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -63,51 +96,20 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./Images/logo.png" alt="" class="navbar-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../Images/logo.png" alt="" class="navbar-logo">
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -122,59 +124,59 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercises">    
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01a.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01a.html" rel="" target="">
  <span class="dropdown-text">1a Geospatial Data Wrangling</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01b.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01b.html" rel="" target="">
  <span class="dropdown-text">1b Choropleth Mapping</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02a.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02a.html" rel="" target="">
  <span class="dropdown-text">2a 1st Order Spatial Point Patterns Analysis Methods</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02b.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02b.html" rel="" target="">
  <span class="dropdown-text">2b 2nd Order Spatial Point Patterns Analysis Methods</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html" rel="" target="">
  <span class="dropdown-text">3 Network Constrained Spatial Point Patterns Analysis</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html" rel="" target="">
  <span class="dropdown-text">4 Spatial Weights and Applications</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05a.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05a.html" rel="" target="">
  <span class="dropdown-text">5a Global Measures of Spatial Autocorrelation</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05b.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05b.html" rel="" target="">
  <span class="dropdown-text">5b Lobal Measures of Spatial Autocorrelation</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html" rel="" target="">
  <span class="dropdown-text">6 Geographical Segmentation with Spatially Constrained Clustering Techniques</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html" rel="" target="">
  <span class="dropdown-text">7 Calibrating Hedonic Pricing Model</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08.html" rel="" target="">
  <span class="dropdown-text">8 Geographically Weighted Predictive Models</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09a.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09a.html" rel="" target="">
  <span class="dropdown-text">9a Processing and Visualising Flow Data</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09b.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09b.html" rel="" target="">
  <span class="dropdown-text">9b Calibrating Spatial Interaction Models</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex10/Hands-on_Ex10.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex10/Hands-on_Ex10.html" rel="" target="">
  <span class="dropdown-text">10 Modelling Geographical Accessibility</span></a>
   </li>  
     </ul>
@@ -185,11 +187,11 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercises">    
         <li>
-    <a class="dropdown-item" href="./In-class_Ex/In-class_Ex01/In-class_Ex01.html" rel="" target="">
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex01/In-class_Ex01.html" rel="" target="">
  <span class="dropdown-text">1/</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class_Ex/In-class_Ex06/In-class_Ex02.html" rel="" target="">
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex06/In-class_Ex02.html" rel="" target="">
  <span class="dropdown-text">2/</span></a>
   </li>  
     </ul>
@@ -200,15 +202,15 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercises">    
         <li>
-    <a class="dropdown-item" href="./Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html" rel="" target="">
+    <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html" rel="" target="">
  <span class="dropdown-text">1/</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Take-Home_Ex/Take-Home_Ex02/Take-Home_Ex02.html" rel="" target="">
+    <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex02/Take-Home_Ex02.html" rel="" target="">
  <span class="dropdown-text">2/</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html" rel="" target="">
+    <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.html" rel="" target="">
  <span class="dropdown-text">3/</span></a>
   </li>  
     </ul>
@@ -216,11 +218,11 @@ ul.task-list li input[type="checkbox"] {
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="../../index.html" rel="" target="">
  <span class="menu-text"><i class="fa-solid fa-house fa-lg" aria-label="house"></i></span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html" rel="" target="">
+    <a class="nav-link" href="../../about.html" rel="" target="">
  <span class="menu-text"><i class="fa-solid fa-at fa-lg" aria-label="at"></i></span></a>
   </li>  
 </ul>
@@ -231,159 +233,194 @@ ul.task-list li input[type="checkbox"] {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">In-class Exercise 1: WIP</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 26, 2024</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">August 26, 2024</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1 Overview</a></li>
+  <li><a href="#the-packages" id="toc-the-packages" class="nav-link" data-scroll-target="#the-packages">2 The Packages</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">3 The Data</a></li>
+  <li><a href="#importing-geospatial-data" id="toc-importing-geospatial-data" class="nav-link" data-scroll-target="#importing-geospatial-data">4 Importing Geospatial Data</a>
+  <ul>
+  <li><a href="#import-polygon-feature-data-in-shapefile-format" id="toc-import-polygon-feature-data-in-shapefile-format" class="nav-link" data-scroll-target="#import-polygon-feature-data-in-shapefile-format">4.1 Import polygon feature data in shapefile format</a></li>
+  <li><a href="#import-gis-data-in-kml-format" id="toc-import-gis-data-in-kml-format" class="nav-link" data-scroll-target="#import-gis-data-in-kml-format">4.3 Import GIS data in kml format</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
 
 
 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="Images/landing.PNG" class="img-fluid figure-img" style="width:80.0%"></p>
+<p><img src="images/placeholder.PNG" class="img-fluid figure-img"></p>
 </figure>
 </div>
-<section id="latest-posts" class="level2">
-<h2 class="anchored" data-anchor-id="latest-posts">Latest Posts</h2>
-
+<section id="overview" class="level1">
+<h1>1 Overview</h1>
+<p>WIP~~~~~</p>
+</section>
+<section id="the-packages" class="level1">
+<h1>2 The Packages</h1>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 90%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://www.tidyverse.org/"><strong>tidyverse</strong></a></td>
+<td><p>A collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data.</p>
+<p>Within <strong>tidyverse</strong>, we will explore the use of <strong>readr</strong> for importing csv files, <strong>readxl</strong> for importing Excel worksheets, <strong>tidyr</strong> for manipulating data, <strong>dplyr</strong> for data transformation, and <strong>ggplot2</strong> for visualising data.</p></td>
+</tr>
+<tr class="even">
+<td><a href="https://r-spatial.github.io/sf/"><strong>sf</strong></a></td>
+<td>For importing, managing, and processing geospatial data.</td>
+</tr>
+</tbody>
+</table>
+<p>The code chunk below installs and loads <strong>sf</strong> and <strong>tidyverse</strong> packages into R environment using <code>p_load</code> from the <strong>pacman</strong> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="the-data" class="level1">
+<h1>3 The Data</h1>
+<table class="table">
+<caption>Data Sources</caption>
+<colgroup>
+<col style="width: 10%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Geospatial</td>
+<td><p><a href="https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&amp;resultId=d_d14da225fccf921049ab64238ff473d9">Master Plan 2014 Subzone Boundary Web</a></p>
+<p><em>Source: data.gov.sg<br>
+Format: SHP (ESRI Shapefile)</em></p></td>
+</tr>
+<tr class="even">
+<td>Geospatial</td>
+<td><p><a href="https://beta.data.gov.sg/datasets?query=Pre-Schools+Location&amp;resultId=d_a72bcd23e208d995f3bd4eececeaca43">Pre-Schools Location</a></p>
+<p><em>Source: data.gov.sg<br>
+Format: KML</em></p></td>
+</tr>
+<tr class="odd">
+<td>Geospatial</td>
+<td><p><a href="https://datamall.lta.gov.sg/content/datamall/en/static-data.html">Cycling Path</a></p>
+<p><em>Source: LTA Data Mall<br>
+Format: SHP</em></p></td>
+</tr>
+<tr class="even">
+<td>Aspatial</td>
+<td><p><a href="https://insideairbnb.com/get-the-data/">Singapore AirBnB Listing</a></p>
+<p>Source: Inside AirBnB<br>
+Format: CSV</p></td>
+</tr>
+</tbody>
+</table>
+<p>Unzip these downloads and save them into <em>geospatial</em> and <em>aspatial</em> sub-folders of the <em>data</em> folder.</p>
+</section>
+<section id="importing-geospatial-data" class="level1">
+<h1>4 Importing Geospatial Data</h1>
+<section id="import-polygon-feature-data-in-shapefile-format" class="level2">
+<h2 class="anchored" data-anchor-id="import-polygon-feature-data-in-shapefile-format">4.1 Import polygon feature data in shapefile format</h2>
+<p>The code chunk below uses <code>st_read()</code> function of sf package:</p>
+<ul>
+<li>read simple features form file/database, or retrieve layer names and their geometry types(s)</li>
+<li>imports <strong>MPSZ-2019</strong> shapefile into R as <u>polygon</u> feature data frame</li>
+<li><code>dsn</code> = defines data path; <code>layer</code> = provide the shapefile name</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mpsz <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">layer =</span> <span class="st">"MPSZ-2019"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `MPSZ-2019' from data source 
+  `C:\kytjy\ISSS626-GAA\In-class_Ex\In-class_Ex01\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 332 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<div class="lightbox light">
+<p><strong>Interpretation</strong></p>
+<ul>
+<li>Geometry type = <u><strong>multipolygon</strong></u> features</li>
+<li>332 multipolygon features and 6 fields in simple feature data frame</li>
+<li>Geodetic CRS = <strong><em>WGS84</em></strong> coordinates system</li>
+<li>Bounding box provides x extend and y extend of the data</li>
+</ul>
+</div>
+</section>
+<section id="import-gis-data-in-kml-format" class="level2">
+<h2 class="anchored" data-anchor-id="import-gis-data-in-kml-format">4.3 Import GIS data in kml format</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#preschool = st_read("data/geospatial/PreSchoolsLocation.kml")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="lightbox light">
+<p><strong>Interpretation</strong></p>
+<ul>
+<li><strong>preschool</strong> = <u>point</u> feature data frame</li>
+<li>2290 features and 2 fields</li>
+<li>Geodetic CRS = <strong><em>WGS84</em></strong> coordinates system</li>
+</ul>
+</div>
 
 
 </section>
+</section>
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-listing-date-sort="1724601600000" data-listing-file-modified-sort="1724667655354" data-listing-date-modified-sort="1724667655000" data-listing-reading-time-sort="19">
-<div class="thumbnail">
-<p><a href="./In-class_Ex/In-class_Ex01/In-class_Ex01.html"> <p class="card-img-top"><img src="In-class_Ex\In-class_Ex01\images\placeholder.PNG"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./In-class_Ex/In-class_Ex01/In-class_Ex01.html">
-<h3 class="no-anchor listing-title">
-In-class Exercise 1: WIP
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-WIP~~~~~
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./In-class_Ex/In-class_Ex01/In-class_Ex01.html">
-<div class="listing-date">
-Aug 26, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-listing-date-sort="1723996800000" data-listing-file-modified-sort="1724603959018" data-listing-date-modified-sort="1724603959000" data-listing-reading-time-sort="68">
-<div class="thumbnail">
-<p><a href="./Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html"> <p class="card-img-top"><img src="Hands-on_Ex\Hands-on_Ex06\images\placeholder.PNG"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html">
-<h3 class="no-anchor listing-title">
-Hands-on Exercise 6: Geographical Segmentation with Spatially Constrained Clustering Techniques
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-In this…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html">
-<div class="listing-date">
-Aug 19, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-listing-date-sort="1723737600000" data-listing-file-modified-sort="1723823010634" data-listing-date-modified-sort="1723823010000" data-listing-reading-time-sort="33">
-<div class="thumbnail">
-<p><a href="./Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05b.html"> <p class="card-img-top"><img src="Hands-on_Ex\Hands-on_Ex05\images\placeholder_5b.PNG"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05b.html">
-<h3 class="no-anchor listing-title">
-Hands-on Exercise 5b: Local Measures of Spatial Autocorrelation
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-Local Measures of Spatial Autocorrelation (LMSA) focuses on the relationships between each observation and its surroundings, rather than providing a…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05b.html">
-<div class="listing-date">
-Aug 16, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-listing-date-sort="1723651200000" data-listing-file-modified-sort="1723814547584" data-listing-date-modified-sort="1723814547000" data-listing-reading-time-sort="23">
-<div class="thumbnail">
-<p><a href="./Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05a.html"> <p class="card-img-top"><img src="Hands-on_Ex\Hands-on_Ex05\images\placeholder.PNG"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05a.html">
-<h3 class="no-anchor listing-title">
-Hands-on Exercise 5a: Global Measures of Spatial Autocorrelation
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-Learning how to compute Global Measure of Spatial Autocorrelation (GLSA) by using <strong>spdep</strong> package, including:
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05a.html">
-<div class="listing-date">
-Aug 15, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-listing-date-sort="1723478400000" data-listing-file-modified-sort="1723817798905" data-listing-date-modified-sort="1723817798000" data-listing-reading-time-sort="31">
-<div class="thumbnail">
-<p><a href="./Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html"> <p class="card-img-top"><img src="Hands-on_Ex\Hands-on_Ex04\images\placeholder.PNG"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html">
-<h3 class="no-anchor listing-title">
-Hands-on Exercise 4: Spatial Weights and Applications
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-In this hands-on exercise, you will learn how to compute spatial weights using R.
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html">
-<div class="listing-date">
-Aug 13, 2024
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
