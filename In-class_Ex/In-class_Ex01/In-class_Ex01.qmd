@@ -1,5 +1,5 @@
 ---
-title: "In-class Exercise 1: WIP"
+title: "In-class Exercise 1"
 title-block-banner: true
 date: "26-Aug-24"
 date-modified: "last-modified"
@@ -11,6 +11,7 @@ execute:
   echo: true #if false, displays charts without codes
   eval: true #if false, displays codes without charts
   warning: false #dont display if there are any warnings
+  message: false
 format: 
   html:
     code-fold: false
@@ -23,54 +24,57 @@ format:
 
 # 1 Overview
 
-WIP~~~~~
+First in-class exercise~
 
 # 2 The Packages
 
-+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Package                                     | Description                                                                                                                                                                                                                              |
-+=============================================+==========================================================================================================================================================================================================================================+
-| [**tidyverse**](https://www.tidyverse.org/) | A collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data.                                                                                                              |
-|                                             |                                                                                                                                                                                                                                          |
-|                                             | Within **tidyverse**, we will explore the use of **readr** for importing csv files, **readxl** for importing Excel worksheets, **tidyr** for manipulating data, **dplyr** for data transformation, and **ggplot2** for visualising data. |
-+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**sf**](https://r-spatial.github.io/sf/)   | For importing, managing, and processing geospatial data.                                                                                                                                                                                 |
-+---------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Package                                                          | Description                                                                                                                                                                                                                              |
++==================================================================+==========================================================================================================================================================================================================================================+
+| [**tidyverse**](https://www.tidyverse.org/)                      | A collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data.                                                                                                              |
+|                                                                  |                                                                                                                                                                                                                                          |
+|                                                                  | Within **tidyverse**, we will explore the use of **readr** for importing csv files, **readxl** for importing Excel worksheets, **tidyr** for manipulating data, **dplyr** for data transformation, and **ggplot2** for visualising data. |
++------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**sf**](https://r-spatial.github.io/sf/)                        | For importing, managing, and processing geospatial data.                                                                                                                                                                                 |
++------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**tmap**](https://cran.r-project.org/web/packages/tmap/)        | For thematic mapping                                                                                                                                                                                                                     |
++------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**ggstatsplot**](https://indrajeetpatil.github.io/ggstatsplot/) | For statistic tests                                                                                                                                                                                                                      |
++------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-: {tbl-colwidths="\[10,90\]"}
+: {tbl-colwidths="\[15,85\]"}
 
-The code chunk below installs and loads **sf** and **tidyverse** packages into R environment using `p_load` from the **pacman** package.
+The code chunk below installs and loads **sf**, **tidyverse**, **tmap**, and **ggstatsplot** packages into R environment using `p_load` from the **pacman** package.
 
 ```{r}
-pacman::p_load(sf, tidyverse)
+pacman::p_load(sf, tidyverse, tmap, ggstatsplot, knitr, kableExtra)
 ```
-
 
 # 3 The Data
 
-+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Type       | Details                                                                                                                                                                  |
-+============+==========================================================================================================================================================================+
-| Geospatial | [Master Plan 2014 Subzone Boundary Web](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9) |
-|            |                                                                                                                                                                          |
-|            | *Source: data.gov.sg\                                                                                                                                                    |
-|            | Format: SHP (ESRI Shapefile)*                                                                                                                                            |
-+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Geospatial | [Pre-Schools Location](https://beta.data.gov.sg/datasets?query=Pre-Schools+Location&resultId=d_a72bcd23e208d995f3bd4eececeaca43)                                         |
-|            |                                                                                                                                                                          |
-|            | *Source: data.gov.sg\                                                                                                                                                    |
-|            | Format: KML*                                                                                                                                                             |
-+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Geospatial | [Cycling Path](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)                                                                                         |
-|            |                                                                                                                                                                          |
-|            | *Source: LTA Data Mall\                                                                                                                                                  |
-|            | Format: SHP*                                                                                                                                                             |
-+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Aspatial   | [Singapore AirBnB Listing](https://insideairbnb.com/get-the-data/)                                                                                                       |
-|            |                                                                                                                                                                          |
-|            | Source: Inside AirBnB\                                                                                                                                                   |
-|            | Format: CSV                                                                                                                                                              |
-+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Type       | Details                                                                                                                                                                                                     |
++============+=============================================================================================================================================================================================================+
+| Geospatial | [Master Plan 2014 Subzone Boundary Web](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9)                                    |
+|            |                                                                                                                                                                                                             |
+|            | *Source: data.gov.sg\                                                                                                                                                                                       |
+|            | Format: **SHP** (ESRI Shapefile) and **KML***                                                                                                                                                               |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Geospatial | Master Plan 2019 Subzone Boundary Web                                                                                                                                                                       |
+|            |                                                                                                                                                                                                             |
+|            | *Source: data.gov.sg\                                                                                                                                                                                       |
+|            | Format: **SHP** and **KML***                                                                                                                                                                                |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Aspatial   | [Pre-Schools Location](https://beta.data.gov.sg/datasets?query=Pre-Schools+Location&resultId=d_a72bcd23e208d995f3bd4eececeaca43)                                                                            |
+|            |                                                                                                                                                                                                             |
+|            | *Source: data.gov.sg\                                                                                                                                                                                       |
+|            | Format: KML*                                                                                                                                                                                                |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Aspatial   | [Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data) |
+|            |                                                                                                                                                                                                             |
+|            | *Source: singstat.gov.sg\                                                                                                                                                                                   |
+|            | Format: CSV*                                                                                                                                                                                                |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Data Sources {tbl-colwidths="\[10,20,70\]"}
 
@@ -78,38 +82,160 @@ Unzip these downloads and save them into *geospatial* and *aspatial* sub-folders
 
 # 4 Importing Geospatial Data
 
-## 4.1 Import polygon feature data in shapefile format
+## 4.1 Import Master Plan 2014 Subzone Boundary data
+
+::: panel-tabset
+## Shapefile
 
 The code chunk below uses `st_read()` function of sf package:
 
 -   read simple features form file/database, or retrieve layer names and their geometry types(s)
--   imports **MPSZ-2019** shapefile into R as [polygon]{.underline} feature data frame
+-   imports *MP14_SUBZONE_WEB_PL* shapefile into R as [polygon]{.underline} feature data frame
 -   `dsn` = defines data path; `layer` = provide the shapefile name
 
 ```{r}
-mpsz = st_read(dsn = "data/geospatial", 
-                  layer = "MPSZ-2019")
+mpsz14_shp <- st_read(dsn = "data/geospatial", 
+                  layer = "MP14_SUBZONE_WEB_PL")
+```
+
+```{r}
+class(mpsz14_shp)
 ```
 
 ::: {.lightbox .light data-latex="light"}
 **Interpretation**
 
 -   Geometry type = [**multipolygon**]{.underline} features
--   332 multipolygon features and 6 fields in simple feature data frame
--   Geodetic CRS = ***WGS84*** coordinates system
+-   323 multipolygon features and 15 fields in simple feature data frame
+-   Projected CRS = ***SVY21*** coordinates system
 -   Bounding box provides x extend and y extend of the data
 :::
 
-## 4.3 Import GIS data in kml format
+## KML
 
 ```{r}
-#preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
+#| eval: false
+#| output: false
+
+mpsz14_kml <- st_write(mpsz14_shp,
+                       "data/geospatial/MP14_SUBZONE_WEB_PL.kml",
+                       delete_dsn = TRUE)
+```
+
+## Health Check
+
+```{r}
+st_geometry(mpsz14_shp)
+```
+
+```{r}
+#| echo: false
+mpsz14_shp %>% 
+  kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                            fixed_thead = T)
+
+```
+:::
+
+## 4.2 Import Master Plan 2019 Subzone Boundary data
+
+::: panel-tabset
+## Shapefile
+
+```{r}
+mpsz19_shp <- st_read(dsn = "data/geospatial", 
+                  layer = "MPSZ-2019") %>% 
+  st_transform(crs = 3414)
 ```
 
 ::: {.lightbox .light data-latex="light"}
 **Interpretation**
 
--   **preschool** = [point]{.underline} feature data frame
--   2290 features and 2 fields
+-   **mpsz19** = [multipolygon]{.underline} feature data frame
+-   332 features and 2 fields
 -   Geodetic CRS = ***WGS84*** coordinates system
+
+**Note:** WGS84 is in decimal degree. Geographical coordinate systems is distorted and requires conversion to projected coordinate systems (PCS) to SVY21 for Singapore.
 :::
+
+## KML
+
+```{r}
+mpsz19_kml <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
+```
+
+## Health Check
+
+```{r}
+st_geometry(mpsz19_shp)
+```
+
+```{r}
+#| echo: false
+mpsz19_shp %>% 
+  kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                            fixed_thead = T)
+
+```
+:::
+
+## 4.3 Import aspatial data
+
+Next, we will import *respopagsex2000to2018.csv* file into RStudio and save the file into an R dataframe called *popdata*. The task will be performed by using `read_csv()` function of **readr** package.
+
+```{r}
+popdata <- read_csv("data/aspatial/respopagesextod2011to2020.csv")
+```
+```{r}
+#| echo: false
+DT::datatable(head(popdata, 200),
+              filter = 'top',
+              class = "compact",
+              options = list(pageLength = 5, dom = 'tip'))
+```
+
+# 5 Data Wrangling
+
+The following data wrangling and transformation functions will be used:
+
+-   [`pivot_wider()`](https://tidyr.tidyverse.org/reference/pivot_wider.html) of **tidyr** package, and
+-   `mutate()`, `filter()`, `group_by()`, and `select()` of **dplyr** package
+
+```{r}
+popdata2020 <- popdata %>% 
+  filter(Time==2020) %>% 
+  group_by(PA, SZ, AG) %>% # Group by Planning Area, Subzone, Age Group
+  summarise(`POP`=sum(`Pop`)) %>%  # Summarise by # of population 
+  ungroup() %>% 
+  pivot_wider(names_from=AG,
+              values_from = POP)
+
+colnames(popdata2020)
+```
+
+```{r}
+popdata2020 <- popdata2020 %>% 
+  # Young: Aged 0 to 24
+  mutate(YOUNG=rowSums(.[3:6]) # Aged 0 - 24, 10 - 24
+         +rowSums(.[14])) %>% # Aged 5 - 9
+  
+  # Economic Active: Aged 25 to 64
+  mutate(`ECONOMY ACTIVE` = rowSums(.[7:13])+ # Aged 25 - 59
+  rowSums(.[15])) %>%  # Aged 60 - 64
+  
+  # Aged: > 65
+  mutate(`AGED`=rowSums(.[16:21])) %>% 
+  
+  # Total: all age groups
+  mutate(`TOTAL`=rowSums(.[3:21])) %>% 
+  
+  # Proportion of inactive population per working population
+  mutate(`DEPENDENCY`=(`YOUNG` + `AGED`)
+  / `ECONOMY ACTIVE`) %>% 
+  
+  select(`PA`, `SZ`, `YOUNG`, 
+         `ECONOMY ACTIVE`, `AGED`,
+         `TOTAL`, `DEPENDENCY`)
+```
