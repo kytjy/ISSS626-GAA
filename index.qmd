@@ -13,6 +13,5 @@ listing:
 toc: false
 ---
 
-![](Images/landing.PNG){fig-align="center" width="80%"}
+![](Images/main.png){fig-align="center" width="100%"}
 
-## Latest Posts

@@ -1,5 +1,5 @@
 ---
-title: "In-class Exercise 1"
+title: "In-class Exercise 1: Geospatial Data Science with R"
 title-block-banner: true
 date: "26-Aug-24"
 date-modified: "last-modified"
@@ -24,7 +24,7 @@ format:
 
 # 1 Overview
 
-First in-class exercise~
+First in-class exercise\~
 
 # 2 The Packages
 
@@ -52,35 +52,35 @@ pacman::p_load(sf, tidyverse, tmap, ggstatsplot, knitr, kableExtra)
 
 # 3 The Data
 
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Type       | Details                                                                                                                                                                                                     |
-+============+=============================================================================================================================================================================================================+
-| Geospatial | [Master Plan 2014 Subzone Boundary Web](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9)                                    |
-|            |                                                                                                                                                                                                             |
-|            | *Source: data.gov.sg\                                                                                                                                                                                       |
-|            | Format: **SHP** (ESRI Shapefile) and **KML***                                                                                                                                                               |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Geospatial | Master Plan 2019 Subzone Boundary Web                                                                                                                                                                       |
-|            |                                                                                                                                                                                                             |
-|            | *Source: data.gov.sg\                                                                                                                                                                                       |
-|            | Format: **SHP** and **KML***                                                                                                                                                                                |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Aspatial   | [Pre-Schools Location](https://beta.data.gov.sg/datasets?query=Pre-Schools+Location&resultId=d_a72bcd23e208d995f3bd4eececeaca43)                                                                            |
-|            |                                                                                                                                                                                                             |
-|            | *Source: data.gov.sg\                                                                                                                                                                                       |
-|            | Format: KML*                                                                                                                                                                                                |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Aspatial   | [Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data) |
-|            |                                                                                                                                                                                                             |
-|            | *Source: singstat.gov.sg\                                                                                                                                                                                   |
-|            | Format: CSV*                                                                                                                                                                                                |
-+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Type       | Details                                                                                                                                                                                                |
++============+========================================================================================================================================================================================================+
+| Geospatial | [Master Plan 2014 Subzone Boundary Web](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9)                               |
+|            |                                                                                                                                                                                                        |
+|            | *Source: data.gov.sg\                                                                                                                                                                                  |
+|            | Format: **SHP** (ESRI Shapefile) and **KML***                                                                                                                                                          |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Geospatial | Master Plan 2019 Subzone Boundary Web                                                                                                                                                                  |
+|            |                                                                                                                                                                                                        |
+|            | *Source: data.gov.sg\                                                                                                                                                                                  |
+|            | Format: **SHP** and **KML***                                                                                                                                                                           |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Aspatial   | [Pre-Schools Location](https://beta.data.gov.sg/datasets?query=Pre-Schools+Location&resultId=d_a72bcd23e208d995f3bd4eececeaca43)                                                                       |
+|            |                                                                                                                                                                                                        |
+|            | *Source: data.gov.sg\                                                                                                                                                                                  |
+|            | Format: KML*                                                                                                                                                                                           |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Aspatial   | [Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2023](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data) |
+|            |                                                                                                                                                                                                        |
+|            | *Source: singstat.gov.sg\                                                                                                                                                                              |
+|            | Format: CSV*                                                                                                                                                                                           |
++------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Data Sources {tbl-colwidths="\[10,20,70\]"}
 
 Unzip these downloads and save them into *geospatial* and *aspatial* sub-folders of the *data* folder.
 
-# 4 Importing Geospatial Data
+# 4 Importing Data
 
 ## 4.1 Import Master Plan 2014 Subzone Boundary data
 
@@ -125,12 +125,13 @@ mpsz14_kml <- st_write(mpsz14_shp,
 ## Health Check
 
 ```{r}
-st_geometry(mpsz14_shp)
+st_crs(mpsz14_shp)
 ```
 
 ```{r}
 #| echo: false
-mpsz14_shp %>% 
+mpsz14_shp %>%
+  head() %>% 
   kable() %>% 
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
                             fixed_thead = T)
@@ -168,12 +169,13 @@ mpsz19_kml <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml
 ## Health Check
 
 ```{r}
-st_geometry(mpsz19_shp)
+st_crs(mpsz19_shp)
 ```
 
 ```{r}
 #| echo: false
 mpsz19_shp %>% 
+  head() %>% 
   kable() %>% 
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
                             fixed_thead = T)
@@ -181,22 +183,93 @@ mpsz19_shp %>%
 ```
 :::
 
-## 4.3 Import aspatial data
+## 4.3 Import Pre-School Locations
 
-Next, we will import *respopagsex2000to2018.csv* file into RStudio and save the file into an R dataframe called *popdata*. The task will be performed by using `read_csv()` function of **readr** package.
+*PreSchoolsLocation* is in kml format. Below code chunk used to import kml into R.
 
 ```{r}
-popdata <- read_csv("data/aspatial/respopagesextod2011to2020.csv")
+preschool = st_read("data/geospatial/PreSchoolsLocation.kml") %>% 
+    st_transform(crs = 3414)
 ```
+
+::: {.lightbox .light data-latex="light"}
+**Interpretation**
+
+-   **preschool** = [point]{.underline} feature data frame
+-   2290 features and 2 fields
+-   Geodetic CRS = ***WGS84*** coordinates system
+:::
+
+## 4.4 Import Population Data
+
+Next, we will import *respopagsextod2023.csv* file into RStudio and save the file into an R dataframe called *popdata*. The task will be performed by using `read_csv()` function of **readr** package.
+
+```{r}
+popdata <- read_csv("data/aspatial/respopagesextod2023.csv")
+```
+
 ```{r}
 #| echo: false
-DT::datatable(head(popdata, 200),
+DT::datatable(head(popdata, 10),
               filter = 'top',
               class = "compact",
               options = list(pageLength = 5, dom = 'tip'))
 ```
 
-# 5 Data Wrangling
+# 5 Geospatial Data Wrangling
+
+## 5.1 Point-in-Polygon count
+
+The code chunk below counts the number of pre-schools in each planning sub-zone using [`st_intersects`](https://postgis.net/docs/ST_Intersects.html) to identify where 2 geometries intersects (i.e. any common points).
+
+[`lengths()`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/lengths) returns the number of elements in a list/vector. In this case, it returns the number of pre-schools in each subzone of the *mpsz19_shp* shapefile.
+
+```{r}
+mpsz19_shp <- mpsz19_shp %>%
+  mutate(`PreSch Count` = lengths(
+    st_intersects(mpsz19_shp, preschool)))
+```
+
+## 5.2 Computing density
+
+The code chunk below performs the following functions:
+
+-   Derive the area of each planning sub-zone using [`st_area`](https://postgis.net/docs/ST_Area.html)
+-   Drop the unit of measurement of the area (i.e. m\^2)
+-   Calculate the density of pre-school at the planning sub-zone level.
+
+```{r}
+mpsz19_shp <- mpsz19_shp %>%
+  mutate(Area = units::drop_units(
+    st_area(.)),
+    `PreSch Density` = `PreSch Count` / Area * 1000000
+  )
+```
+
+# 6 Statistical Analysis
+
+In the following section, we use Exploratory Data Analysis (EDA) and Confirmatory Data Analysis (CDA) methods to explore and confirm the statistical relationship between Pre-school Density and Pre-school count. In the code chunk below, we use [`ggscatterstats()`](https://indrajeetpatil.github.io/ggstatsplot/articles/web_only/ggscatterstats.html) of **ggstatsplot** package.
+
+```{r}
+mpsz19_shp$`PreSch Density` <- as.numeric(as.character(mpsz19_shp$`PreSch Density`))
+mpsz19_shp$`PreSch Count` <- as.numeric(as.character(mpsz19_shp$`PreSch Count`)) 
+mpsz19_df <- as.data.frame(mpsz19_shp)
+
+ggstatsplot::ggscatterstats(data = mpsz19_df,
+               x = `PreSch Density`,
+               y = `PreSch Count`,
+               type = "parametric",
+               label.var = SUBZONE_N,
+               label.expression = `PreSch Count` > 40) +
+  theme_classic() +
+  theme(plot.background = element_rect(fill = "#E4D5C9", color = "#E4D5C9"),
+        legend.background = element_rect(fill="#E4D5C9"),
+        panel.background = element_rect(fill="#E4D5C9")) 
+```
+
+# 7 Working with Population Data
+
+## 7.1 Extract relevant data
 
 The following data wrangling and transformation functions will be used:
 
@@ -204,21 +277,20 @@ The following data wrangling and transformation functions will be used:
 -   `mutate()`, `filter()`, `group_by()`, and `select()` of **dplyr** package
 
 ```{r}
-popdata2020 <- popdata %>% 
-  filter(Time==2020) %>% 
+popdata2023 <- popdata %>% 
   group_by(PA, SZ, AG) %>% # Group by Planning Area, Subzone, Age Group
   summarise(`POP`=sum(`Pop`)) %>%  # Summarise by # of population 
   ungroup() %>% 
   pivot_wider(names_from=AG,
               values_from = POP)
 
-colnames(popdata2020)
+colnames(popdata2023)
 ```
 
 ```{r}
-popdata2020 <- popdata2020 %>% 
+popdata2023 <- popdata2023 %>% 
   # Young: Aged 0 to 24
-  mutate(YOUNG=rowSums(.[3:6]) # Aged 0 - 24, 10 - 24
+  mutate(YOUNG=rowSums(.[3:6]) # Aged 0 - 24
          +rowSums(.[14])) %>% # Aged 5 - 9
   
   # Economic Active: Aged 25 to 64
@@ -238,4 +310,229 @@ popdata2020 <- popdata2020 %>%
   select(`PA`, `SZ`, `YOUNG`, 
          `ECONOMY ACTIVE`, `AGED`,
          `TOTAL`, `DEPENDENCY`)
+```
+
+## 7.2 Joining aspatial and geospatial data
+
+`toupper()` converts elements of columns *PA* and *SZ* to upper case.
+
+```{r}
+popdata2023 <- popdata2023 %>%
+  mutate_at(.vars = vars(PA, SZ), 
+          .funs = list(toupper)) 
+```
+
+The code chunk below uses `left_join()` to joins geospatial data *mpsz19_shp* with *popdata2023*. Keeping *mpsz19_shp* on the left allows us to retain geometry details.
+
+```{r}
+mpsz_pop2023 <- left_join(mpsz19_shp, popdata2023,
+                          by = c("SUBZONE_N" = "SZ"))
+```
+
+```{r}
+pop2023_mpsz <- left_join(popdata2023, mpsz19_shp, 
+                          by = c("SZ" = "SUBZONE_N"))
+```
+
+# 8 Choropleth Map of Dependency Ratio by Planning Subzone
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+tm_shape(mpsz_pop2023)+
+  
+  tm_fill("DEPENDENCY", 
+          style = "quantile", 
+          palette = "Blues",
+          title = "Dependency ratio") +
+  
+  tm_layout(main.title = "Distribution of Dependency Ratio by planning subzone",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.title.size = 1,
+            legend.height = 0.45, 
+            legend.width = 0.35,
+            bg.color = "#E4D5C9",
+            frame = F) +
+  
+  tm_borders(alpha = 0.5) +
+  tm_compass(type="8star", size = 1.5) +
+  tm_scale_bar() +
+  tm_grid(alpha =0.2) +
+  tm_credits("Source: Planning Sub-zone boundary from Urban Redevelopment Authorithy (URA)\n and Population data from Department of Statistics (DOS)", 
+             position = c("left", "bottom"))
+```
+
+# 9 Analytical Map - Percentile Map
+
+The percentile map is a special type of quantile map with six specific categories: 0-1%,1-10%, 10-50%,50-90%,90-99%, and 99-100%. The corresponding breakpoints can be derived by means of the base R quantile command, passing an explicit vector of cumulative probabilities as *c(0,.01,.1,.5,.9,.99,1)*. Note that the begin and endpoint need to be included.
+
+## 9.1 Data preparation
+
+The code chunk below excludes records with NA by using the code chunk below.
+
+```{r}
+mpsz_pop2023 <- mpsz_pop2023 %>%
+  drop_na()
+```
+
+## 9.2 Defining the `get.var` function
+
+The code chunk below defines a function to get the input data and field to be used for creating the percentile map.
+
+```{r}
+get.var <- function(vname,df) {
+  v <- df[vname] %>% 
+    st_set_geometry(NULL)
+  v <- unname(v[,1])
+  return(v)
+}
+```
+
+## 9.3 Percentile mapping function
+
+The code chunk below creates a function for computing and plotting the percentile map.
+
+```{r}
+percentmap <- function(vnam, df, legtitle=NA, mtitle="Percentile Map"){
+  percent <- c(0,.01,.1,.5,.9,.99,1)
+  var <- get.var(vnam, df)
+  bperc <- quantile(var, percent)
+  tm_shape(mpsz_pop2023) +
+  tm_polygons() +
+  tm_shape(df) +
+     tm_fill(vnam,
+             title=legtitle,
+             breaks=bperc,
+             palette="Blues",
+          labels=c("< 1%", "1% - 10%", "10% - 50%", "50% - 90%", "90% - 99%", "> 99%"))  +
+  tm_borders() +
+  tm_layout(main.title = mtitle, 
+            title.position = c("right","bottom"),
+            bg.color = "#E4D5C9",
+            frame = F)
+}
+```
+
+## 9.4 Plotting the map
+
+The code chunk below runs the percentile map function.
+
+```{r}
+percentmap("DEPENDENCY", mpsz_pop2023)
+```
+
+# 10 Analytical Map - Box Map
+
+A box map is an augmented quartile map, with an additional lower and upper category. When there are lower outliers, then the starting point for the breaks is the minimum value, and the second break is the lower fence. In contrast, when there are no lower outliers, then the starting point for the breaks will be the lower fence, and the second break is the minimum value (there will be no observations that fall in the interval between the lower fence and the minimum value).
+
+## 10.1 Creating `boxbreaks` function
+
+The code chunk below is an R function that creating break points for a box map.
+
+-   arguments:
+    -   v: vector with observations
+    -   mult: multiplier for IQR (default 1.5)
+-   returns:
+    -   bb: vector with 7 break points compute quartile and fences
+
+```{r}
+boxbreaks <- function(v,mult=1.5) {
+  qv <- unname(quantile(v))
+  iqr <- qv[4] - qv[2]
+  upfence <- qv[4] + mult * iqr
+  lofence <- qv[2] - mult * iqr
+  
+  # initialize break points vector
+  bb <- vector(mode="numeric",length=7)
+  
+  # logic for lower and upper fences
+  if (lofence < qv[1]) {  # no lower outliers
+    bb[1] <- lofence
+    bb[2] <- floor(qv[1])
+  } else {
+    bb[2] <- lofence
+    bb[1] <- qv[1]
+  }
+  
+  if (upfence > qv[5]) { # no upper outliers
+    bb[7] <- upfence
+    bb[6] <- ceiling(qv[5])
+  } else {
+    bb[6] <- upfence
+    bb[7] <- qv[5]
+  }
+  
+  bb[3:5] <- qv[2:4]
+  return(bb)
+}
+```
+
+## 10.2 Defining the `get.var` function
+
+The R function below extracts a variable as a vector out of an sf data frame.
+
+-   arguments:
+    -   vname: variable name (as character, in quotes)
+    -   df: name of sf data frame
+-   returns:
+    -   v: vector with values (without a column name)
+
+```{r}
+get.var <- function(vname,df) {
+  v <- df[vname] %>% 
+    st_set_geometry(NULL)
+  v <- unname(v[,1])
+  return(v)
+}
+```
+
+## 10.3 Boxmap function
+
+The code chunk below is an R function to create a box map.
+
+-   arguments:
+    -   vnam: variable name (as character, in quotes)
+    -   df: simple features polygon layer
+    -   legtitle: legend title
+    -   mtitle: map title
+    -   mult: multiplier for IQR
+-   returns:
+    -   a tmap-element (plots a map)
+
+```{r}
+boxmap <- function(vnam, df, 
+                   legtitle=NA,
+                   mtitle="Box Map",
+                   mult=1.5){
+  var <- get.var(vnam,df)
+  bb <- boxbreaks(var)
+  tm_shape(df) +
+    tm_polygons() +
+  tm_shape(df) +
+     tm_fill(vnam,title=legtitle,
+             breaks=bb,
+             palette="Blues",
+          labels = c("Lower outlier", 
+                     "< 25%", 
+                     "25% - 50%", 
+                     "50% - 75%",
+                     "> 75%", 
+                     "Upper outlier"))  +
+  tm_borders() +
+  tm_layout(main.title = mtitle, 
+            title.position = c("left",
+                               "top"),
+            bg.color = "#E4D5C9",
+            frame = F)
+}
+```
+
+## 10.4 Plotting the map
+
+```{r}
+tmap_options(check.and.fix = TRUE)
+tmap_mode("view")
+boxmap("DEPENDENCY", mpsz_pop2023)
 ```
