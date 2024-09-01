@@ -1,0 +1,650 @@
+---
+title: "Hands-on Exercise 8: Geographically Weighted Predictive Models"
+title-block-banner: true
+date: "31-Aug-24"
+date-modified: "last-modified"
+toc: true
+toc-depth: 4
+editor: visual
+execute: 
+  freeze: true #never re-render during project render
+  echo: true #if false, displays charts without codes
+  eval: true #if false, displays codes without charts
+  warning: false #dont display if there are any warnings
+format: 
+  html:
+    code-fold: false
+    code-overflow: scroll
+    code-summary: "Show the code"
+    code-line-numbers: false
+---
+
+# 1 Overview
+
+Predictive modelling utilises statistical or machine learning techniques to predict outcomes. A set of known outcomes and predictors are used to calibrate predictive models.
+
+Geospatial predictive modelling is conceptually rooted in the principle that the occurrences of events being modeled are limited in distribution. When geographically referenced data are used, occurrences of events are neither uniform nor random in distribution over space. There are geospatial factors (infrastructure, sociocultural, topographic, etc.) that constrain and influence where the locations of events occur. Geospatial predictive modeling attempts to describe those constraints and influences by spatially correlating occurrences of historical geospatial locations with environmental factors that represent those constraints and influences.
+
+::: {.sherbox .sherlock data-latex="sherlock"}
+**Learning Outcome**
+
+This exercise aims to build predictive models using geographical random forest. Along the way, the intended acquired skills are:
+
+-   Preparing training and test data sets using sampling methods
+
+-   Calibrating predictive models using both geospatial statistical learning and machine learning methods
+
+-   Comparing and selecting the best model for predicting the future outcome and,
+
+-   Predicting future outcomes using the best calibrated model
+:::
+
+# 2 The Packages
+
+::: panel-tabset
+## Packages
+
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Package                                                                                                                                   | Usage                                                  |
++===========================================================================================================================================+========================================================+
+| [**sf**](https://cran.r-project.org/web/packages/sf/index.html)**,**                                                                      | For spatial data handling                              |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| [**spdep**](https://r-spatial.github.io/spdep/reference/index.html)                                                                       | For spatial data analysis                              |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| [**GWmodel**](https://cran.r-project.org/web/packages/GWmodel/)                                                                           | For calibrating geographical weighted family of models |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| [**SpatialML**](https://cran.r-project.org/web/packages/SpatialML/index.html)                                                             | For geographically weighted random forest regression   |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| [**rsample**](https://rsample.tidymodels.org/)                                                                                            | For creating and analysing resamples of a data set     |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| [**Metrics**](https://github.com/mfrasco/Metrics)                                                                                         | For machine learning metrics                           |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| [**tmap**](https://cran.r-project.org/web/packages/tmap/)                                                                                 | Choropleth mapping; thematic maps                      |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| [**tidyverse**](https://www.tidyverse.org/)                                                                                               | Attribute data handling                                |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| [**DT**](https://rstudio.github.io/DT/), [**knitr**](https://yihui.org/knitr/), [**kableExtra**](https://haozhu233.github.io/kableExtra/) | For building tables                                    |
++-------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+
+: {tbl-colwidths="\[20,80\]"}
+
+## Code
+
+```{r}
+pacman::p_load(sf, spdep, 
+               GWmodel, 
+               SpatialML, 
+               rsample, 
+               Metrics,
+               tmap, 
+               tidyverse,
+               DT, knitr, kableExtra, gtsummary)
+```
+:::
+
+# 3 The Data
+
+:::panel-tabset
+
+## Sources
+
+Two data sets will be used in this hands-on exercise, they are:
+
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Type                                              | Name                                                                                                                                                                     | Source              | Details                                                                                               | Screenshot                                             |
++===================================================+==========================================================================================================================================================================+=====================+=======================================================================================================+========================================================+
+| Aspatial                                          | [HDB Resale data](https://data.gov.sg/datasets?query=hdb+resale&page=1&resultId=d_8b84c4ee58e3cfc0ece0d773c8ca6abc)                                                      | data.gov.sg         | -   List of HDB resale transacted prices in Singapore from Jan 2017 onwards                           | ![](images/hdbresale.PNG){width="200"}                 |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: csv                                                                                       |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Geospatial                                        | [Master Plan 2014 Subzone Boundary Web](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9) | data.gov.sg         | -   Polygon feature data providing information of URA 2014 Master Plan Planning Subzone boundary data | ![](images/MPSZ_SHP.PNG){width="200"}                  |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: SHP (ESRI Shapefile)                                                                      |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [Eldercare Services](https://data.gov.sg/datasets?query=eldercare&page=1&resultId=d_3545b068e3f3506c56b2cb6b6117b884)                                                    | data.gov.sg         | -   List of eldercare in Singapore                                                                    | ![](images/eldercare.PNG){width="200" height="95"}     |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: SHP (ESRI Shapefile)                                                                      |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [Hawker Centers](https://data.gov.sg/datasets?query=hawker+centre&page=1&resultId=d_4a086da0a5553be1d89383cd90d07ecd)                                                    | data.gov.sg         | -   List of hawker centres in Singapore                                                               | ![](images/hawkercentres.PNG){width="200"}             |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: geojson                                                                                   |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [Parks](https://data.gov.sg/datasets?query=parks&page=1&resultId=d_0542d48f0991541706b58059381a6eca)                                                                     | data.gov.sg         | -   List of parks in Singapore                                                                        | ![](images/parks.PNG){width="200"}                     |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: geojson                                                                                   |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [Supermarket](https://data.gov.sg/datasets?query=supermarket&page=1&resultId=d_cac2c32f01960a3ad7202a99c27268a0)s                                                        | data.gov.sg         | -   List of supermarkets in Singapore                                                                 | ![](images/supermarkets.PNG){width="200" height="110"} |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: geojson                                                                                   |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [CHAS Clinics](https://data.gov.sg/datasets?query=chas+clinics&page=1&resultId=d_548c33ea2d99e29ec63a7cc9edcccedc)                                                       | data.gov.sg         | -   List of CHAS clinics in Singapore                                                                 | ![](images/chasclinics.PNG){width="200"}               |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: geojson                                                                                   |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [Childcare Service](https://data.gov.sg/datasets?query=childcare+services&page=1&resultId=d_5d668e3f544335f8028f546827b773b4)                                            | data.gov.sg         | -   List of childcare services in Singapore                                                           | ![](images/childcareservices.PNG){width="200"}         |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: geojson                                                                                   |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [Kindergartens](https://data.gov.sg/datasets?query=kindergartens&page=1&resultId=d_7fe9a72b1afff18e48111772c8d0fd39)                                                     | data.gov.sg         | -   List of kindergartens in Singapore                                                                | ![](images/kindergartens.PNG){width="200"}             |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: geojson                                                                                   |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [Train Station](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)                                                                                        | datamall.lta.gov.sg | -   List of MRT/LRT stations in Singapore with station names and codes                                | ![](images/trainstations.PNG){width="200"}             |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: SHP (ESRI Shapefile)                                                                      |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors with geographic coordinates    | [Bus Stop Location](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)                                                                                    | datamall.lta.gov.sg | -   List of bus stops in Singapore                                                                    | ![](images/busstops.PNG){width="200"}                  |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: SHP (ESRI Shapefile)                                                                      |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors without geographic coordinates | [Primary School](https://data.gov.sg/datasets?query=primary+school&page=1&resultId=d_688b934f82c1059ed0a6993d2a829089)                                                   | data.gov.sg         | -   List of General Information of Schools                                                            | ![](images/primaryschools.PNG){width="200"}            |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: CSV                                                                                       |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors without geographic coordinates | CBD Coordinates                                                                                                                                                          | Google              |                                                                                                       |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors without geographic coordinates | Shopping Malls                                                                                                                                                           | Wikipedia           | -   List of shopping malls in Singapore                                                               |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+| Locational factors without geographic coordinates | [Good Primary Schools](https://www.salary.sg/2021/best-primary-schools-2021-by-popularity)                                                                               | Local Salary Forum  | -   List of primary schools, ordered / ranked in by popularity                                        |                                                        |
+|                                                   |                                                                                                                                                                          |                     |                                                                                                       |                                                        |
+|                                                   |                                                                                                                                                                          |                     | -   Format: CSV                                                                                       |                                                        |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------+--------------------------------------------------------+
+
+: {tbl-colwidths="\[10,15,15,30,30\]"}
+
+## Data Import
+
+```{r}
+mdata <- read_rds("data/aspatial/mdata.rds")
+```
+
+```{r}
+mdata
+```
+
+
+Code chunk below shows a preview of the top 200 records:
+```{r}
+#| echo: false
+DT::datatable(head(mdata,200),
+              filter = 'top',
+              class = "compact",
+              options = list(pageLength = 5, dom = 'tip'))
+
+```
+
+:::
+
+# 4 Data Sampling
+
+We can set a seed for reproducibility.
+
+The entire data is split into training and test data sets with 65% and 35% respectively by using `initial_split()` from **rsample** package. **rsample** is one of the package of **tinymodels**.
+
+```{r}
+set.seed(1234)
+
+resale_split <- initial_split(mdata, 
+                              prop = 6.5/10,)
+
+train_data <- training(resale_split)
+test_data <- testing(resale_split)
+```
+
+```{r}
+#| eval: false
+write_rds(train_data, "data/aspatial/train_data.rds")
+write_rds(test_data, "data/aspatial/test_data.rds")
+```
+
+```{r}
+train_data <- read_rds("data/aspatial/train_data.rds")
+test_data <- read_rds("data/aspatial/test_data.rds")
+```
+
+# 5 Computing Correlation Matrix
+
+The code chunk below checks for any multicollinearity before using predictors in a predictive model. Multicollinearity refers to a situation where two or more predictors in a multiple regression model are highly correlated. If these variables are highly correlated, it can be difficult to disentangle the effect of each predictor on the response variable.
+
+But first, we will need to remove the geometry column from our spatial data frame using the `st_drop_geometry()` function from the **sf** package. This is because the geometry column cannot be included in the correlation matrix.
+
+```{r}
+mdata_nogeo <- mdata %>%
+  st_drop_geometry()
+```
+
+
+```{r}
+colnames(mdata)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+par(bg = '#E4D5C9')
+
+ggstatsplot::ggcorrmat(
+  data = mdata_nogeo[, 2:17],
+  matrix.type = "upper",
+  type = "parametric",
+  colors = c("#E69F00", "white","#d5695d"),
+  tr = 0.2,
+  partial = FALSE,
+  k = 2L,
+  sig.level = 0.05,
+  conf.level = 0.95,
+  bf.prior = 0.707,
+  ggcorrplot.args = list(
+     tl.cex = 7,
+     pch.cex = 5,
+     lab_size = 3
+  )) + 
+  theme(
+    axis.text.x = ggplot2::element_text(
+      margin = ggplot2::margin(t = 0.15, r = 0.15, b = 0.15, l = 0.15, unit = "cm")
+    ),
+    plot.background = element_rect(fill="#E4D5C9",colour="#E4D5C9"),
+    panel.background = element_rect(fill="#E4D5C9",colour="#E4D5C9"),
+    legend.background = element_rect(fill="#E4D5C9",colour="#E4D5C9")    
+  )
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+The correlation matrix above indicates all correlation values are below 0.8, so there is no sign of high multicolinearity.
+
+:::
+
+# 6 Non-spatial multiple linear regression
+
+In this section, we will be building a non-spatial multiple linear regression model. This type of model is a statistical technique that uses several explanatory variables to predict the outcome of a response variable. The goal is to model the relationship between the explanatory and response variables.
+
+We will use the `lm()` function to build the model. The formula inside the lm() function specifies the model structure. The response variable (in this case, *resale_price*) is on the left of the *~*, and the explanatory variables are on the right. The *+* operator is used to include multiple explanatory variables in the model.
+
+```{r}
+price_mlr <- lm(resale_price ~ 
+                  floor_area_sqm +
+                  storey_order + 
+                  remaining_lease_mths +
+                  PROX_CBD + 
+                  PROX_ELDERLYCARE + 
+                  PROX_HAWKER +
+                  PROX_MRT + 
+                  PROX_PARK + 
+                  #PROX_GOOD_PRISCH + 
+                  PROX_MALL +
+                  #PROX_CHAS + 
+                  PROX_SUPERMARKET + 
+                  WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + 
+                  WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                data=train_data)
+
+summary(price_mlr)
+```
+
+# 7 GWR Prediction
+
+In this section, we will calibrate a model to predict HDB resale prices using the geographically weighted regression (GWR) method from the **GWmodel** package. GWR is a local version of spatial regression that generates parameters disaggregated by the spatial units of analysis. This allows for the identification of spatially varying relationships between the predictors and the dependent variable.
+
+## 7.1 Converting sf data frame to SPatialPointDataFrame
+
+First, we need to convert our sf data frame to a SpatialPointDataFrame. This is because the functions in the **GWmodel** package require data in this format. We use the `as_Spatial()` function from the **sf** package to perform this conversion.
+
+```{r}
+train_data_sp <- as_Spatial(train_data)
+train_data_sp
+```
+
+## 7.2 Compute adaptive bandwidth
+
+Next, `bw.gwr()` of **GWmodel** package will be used to determine the optimal bandwidth to be used for the GWR model. The band.width is a parameter of the GWR model that determines the extent of the geographical area that influences a given location’s estimate
+
+```{r}
+colnames(mdata)
+```
+
+
+```{r}
+#| eval: false
+bw_adaptive <- bw.gwr(resale_price ~ 
+                        floor_area_sqm +
+                        storey_order + 
+                        remaining_lease_mths +
+                        PROX_CBD + 
+                        PROX_ELDERLYCARE + 
+                        PROX_HAWKER +
+                        PROX_MRT + 
+                        PROX_PARK + 
+                        #PROX_GOOD_PRISCH +
+                        PROX_MALL +
+                        #PROX_CHAS +
+                        PROX_SUPERMARKET + 
+                        WITHIN_350M_KINDERGARTEN +
+                        WITHIN_350M_CHILDCARE + 
+                        WITHIN_350M_BUS +
+                        WITHIN_1KM_PRISCH,
+                      data=train_data_sp,
+                      approach="CV",
+                      kernel="gaussian",
+                      adaptive=TRUE,
+                      longlat=FALSE)
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+In the adaptive approach, the bandwidth is not a fixed distance but is determined based on the number of nearest neighbor points. This approach is particularly useful in areas where the density of data points varies.
+
+In regions where data points are densely clustered, the adaptive bandwidth will be smaller, allowing the model to capture local variations more accurately. Conversely, in regions where data points are sparse, the adaptive bandwidth will be larger, ensuring that the model has enough data points to make reliable predictions.
+
+The result from the `bw.gwr()` function indicates that the optimal bandwidth for this dataset is 40 neighbor points. This means that when estimating the parameters for a given location, the model will consider the 40 nearest neighbors.
+
+:::
+
+## 7.3 Construct adaptive bandwidth GWR model
+
+Next, let us call the save bandwidth by using the code chunk below.
+
+```{r}
+#| eval: false
+write_rds(bw_adaptive, "data/aspatial/bw_adaptive.rds")
+```
+
+```{r}
+bw_adaptive <- read_rds("data/aspatial/bw_adaptive.rds")
+bw_adaptive
+```
+
+The code chunk below calibrates gwr-based hedonic pricing model using adaptive bandwidth and Gaussian kernel.
+
+```{r}
+#| eval: false
+gwr_adaptive <- gwr.basic(formula = resale_price ~
+                            floor_area_sqm + 
+                            storey_order +
+                            remaining_lease_mths + 
+                            PROX_CBD + 
+                            PROX_ELDERLYCARE + 
+                            PROX_HAWKER +
+                            PROX_MRT + 
+                            PROX_PARK +
+                            #PROX_GOOD_PRISCH +
+                            PROX_MALL + 
+                            #PROX_CHAS +
+                            PROX_SUPERMARKET + 
+                            WITHIN_350M_KINDERGARTEN +
+                            WITHIN_350M_CHILDCARE + 
+                            WITHIN_350M_BUS +
+                            WITHIN_1KM_PRISCH,
+                          data = train_data_sp,
+                          bw = bw_adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive = TRUE,
+                          longlat = FALSE)
+```
+
+The code chunk below will be used to save the model in rds format for future use.
+
+```{r}
+#| eval: false
+write_rds(gwr_adaptive, "data/aspatial/gwr_adaptive.rds")
+```
+
+## 7.4 Retrieve GWR output object
+
+The code chunk below will be used to retrieve the save gwr model object.
+
+```{r}
+gwr_adaptive <- read_rds("data/aspatial/gwr_adaptive.rds")
+```
+
+```{r}
+gwr_adaptive
+```
+
+## 7.5 Convert test data from sf data frame to SpatialPointDataFrame
+
+We need to convert our test data from an sf data frame to a SpatialPointDataFrame. This is because the functions in the **GWmodel** package require data in this format. We use the `as_Spatial()` function from the **sf** package to perform this conversion.
+
+```{r}
+test_data_sp <- test_data %>%
+  as_Spatial()
+
+test_data_sp
+```
+
+## 7.6 Computing adaptive bandwidth for test data
+
+Next, similar to the process performed for training data, we use the `bw.gwr()` function from the GWmodel package to determine the optimal bandwidth for our GWR model on the test data. 
+
+```{r}
+#| eval: false
+gwr_bw_test_adaptive <- bw.gwr(resale_price ~ 
+                                 floor_area_sqm +
+                                 storey_order + 
+                                 remaining_lease_mths +
+                                 PROX_CBD + 
+                                 PROX_ELDERLYCARE + 
+                                 PROX_HAWKER +
+                                 PROX_MRT + 
+                                 PROX_PARK + 
+                                 #PROX_GOOD_PRISCH +
+                                 PROX_MALL + 
+                                 #PROX_CHAS +
+                                 PROX_SUPERMARKET + 
+                                 WITHIN_350M_KINDERGARTEN +
+                                 WITHIN_350M_CHILDCARE + 
+                                 WITHIN_350M_BUS +
+                                 WITHIN_1KM_PRISCH,
+                               data = test_data_sp,
+                               approach = "CV",
+                               kernel = "gaussian",
+                               adaptive = TRUE,
+                               longlat = FALSE)
+```
+
+```{r}
+#| eval: false
+write_rds(gwr_bw_test_adaptive, "data/aspatial/gwr_bw_test_adaptive.rds")
+```
+
+```{r}
+gwr_bw_test_adaptive <- read_rds("data/aspatial/gwr_bw_test_adaptive.rds")
+```
+
+## 7.7 Computing predicted values of the test data
+
+Finally, we use the `gwr.predict()` function from the **GWmodel** package to compute the predicted values of the test data based on our GWR model. We specify our formula, training data, test data, bandwidth, kernel type, and set `adaptive=TRUE` and `longlat=FALSE`.
+
+```{r}
+#| eval: false
+gwr_pred <- gwr.predict(formula = resale_price ~
+                          floor_area_sqm + storey_order +
+                          remaining_lease_mths + PROX_CBD + 
+                          PROX_ELDERLYCARE + PROX_HAWKER + 
+                          PROX_MRT + PROX_PARK + PROX_MALL + 
+                          PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                          WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+                          WITHIN_1KM_PRISCH, 
+                        data=train_data_sp, 
+                        predictdata = test_data_sp, 
+                        bw=40, 
+                        kernel = 'gaussian', 
+                        adaptive=TRUE, 
+                        longlat = FALSE)
+```
+
+# 8 Preparing coordinates data
+
+## 8.1 Extracting coordinates data
+
+The code chunk below extract the x, y coordinates of the full, training and test data sets using `st_coordinates()` function from the **sf** package.
+
+```{r}
+coords <- st_coordinates(mdata)
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+Save the output into rds for future use.
+
+```{r}
+#| eval: false
+coords_train <- write_rds(coords_train, "data/geospatial/coords_train.rds")
+coords_test <- write_rds(coords_test, "data/geospatial/coords_test.rds")
+```
+
+```{r}
+coords_train <- read_rds("data/geospatial/coords_train.rds")
+coords_test <- read_rds("data/geospatial/coords_test.rds")
+```
+
+## 8.2 Dropping geometry field
+
+Next, we drop the geometry column from the sf data frame. This is because the geometry column is not needed for our upcoming analysis. We use the `st_drop_geometry()` function from the **sf** package to perform this operation.
+
+```{r}
+train_data <- train_data %>% 
+  st_drop_geometry()
+```
+
+# 9 Calibrating Random Forest Model
+
+In this section, we will calibrate a model to predict HDB resale prices using the random forest function from the **ranger** package. Random forest is a popular machine learning algorithm that can be used for both regression and classification tasks. It works by creating a multitude of decision trees at training time and outputting the mean prediction of the individual trees for regression tasks.
+
+```{r}
+#| eval: false
+set.seed(1234)
+
+rf <- ranger(resale_price ~ floor_area_sqm + storey_order + 
+               remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + 
+               PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL + 
+               PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+               WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+               WITHIN_1KM_PRISCH,
+             data=train_data)
+```
+
+After fitting the model, we save it as an RDS file using the `write_rds()` function. This allows us to easily load the model in future R sessions.
+
+```{r}
+#| eval: false
+write_rds(rf, "data/aspatial/rf.rds")
+```
+
+```{r}
+rf <- read_rds("data/aspatial/rf.rds")
+rf
+```
+
+# 10 Calibrating Geographical Random Forest Model
+
+## 10.1 Calibrating using training data
+
+In this section, we will calibrate a model to predict HDB resale prices using the `grf()` function from the **SpatialML** package. This function fits a geographically weighted random forest model, which is a type of model that takes into account the spatial relationships between observations.
+
+```{r}
+#| eval: false
+set.seed(1234)
+
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + storey_order +
+                       remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE +
+                       PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL +
+                       PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                       WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                       WITHIN_1KM_PRISCH,
+                     dframe=train_data, 
+                     bw=55,
+                     kernel="adaptive",
+                     coords=coords_train)
+```
+
+```{r}
+#| eval: false
+write_rds(gwRF_adaptive, "data/aspatial/gwRF_adaptive.rds")
+```
+
+```{r}
+gwRF_adaptive <- read_rds("data/aspatial/gwRF_adaptive.rds")
+```
+
+## 10.2 Predicting by using test data
+
+### 10.2.1 Preparing the test data
+
+First, combine the test data with the corresponding coordinates data. None of the rows from our data sets were sorted, so using `cbind()` is sufficient, `st_drop_geometry()` function is used to remove the geometry column.
+
+```{r}
+test_data <- cbind(test_data, coords_test) %>%
+  st_drop_geometry()
+```
+
+### 10.2.2 Predicting with test data
+
+The function `predict.grf()` of **SpatialML** will be used to predict the resale value which uses the test data and *gwRF_adaptive* model calibrated earlier.
+
+```{r}
+gwRF_pred <- predict.grf(gwRF_adaptive, 
+                           test_data, 
+                           x.var.name="X",
+                           y.var.name="Y", 
+                           local.w=1,
+                           global.w=0)
+```
+
+```{r}
+GRF_pred <- write_rds(gwRF_pred, "data/aspatial/GRF_pred.rds")
+```
+
+### 10.2.3 Converting predictive output into data frame
+
+The output of the `predict.grf()` function is a vector of predicted values. For further visualization and analysis, it’s useful to convert it into a data frame.
+
+```{r}
+GRF_pred <- read_rds("data/aspatial/GRF_pred.rds")
+GRF_pred_df <- as.data.frame(GRF_pred)
+```
+
+We then use *cbind()* to append the predicted values into the test data.
+
+```{r}
+test_data_p <- cbind(test_data, GRF_pred_df)
+```
+
+```{r}
+write_rds(test_data_p, "data/aspatial/test_data_p.rds")
+```
+
+## 10.3 Calculating Root Mean Square Error (RMSE)
+
+RMSE measures how far the predicted values are from the observed values in a regression analysis. The Metrics package contains the `rmse()` function which can be used to compute RMSE.
+
+```{r}
+rmse(test_data_p$resale_price, 
+     test_data_p$GRF_pred)
+```
+
+The lower the RMSE value, the better the predictive model is.
+
+## 10.4 Visualising Predicted Values
+
+The individual prices can be plotted in the scatterplot, where plots further away from the regression line were not as well predicted than plot prices closer to the regression line.
+
+```{r}
+test_data_p <- test_data_p[, !(names(test_data_p) %in% c("X.1", "Y.1"))]
+ggplot(data = test_data_p,
+       aes(x = GRF_pred,
+           y = resale_price)) +
+  geom_point(alpha=0.5) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "solid") +
+  theme(panel.background=element_rect(fill='grey96'),
+        plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9"))  
+```
+
+# 11 Reference
+
+Kam, T. S. Geographically Weighted Predictive Models. *R for Geospatial Data Science and Analytics.* <https://r4gdsa.netlify.app/chap14.html>
