@@ -44,13 +44,19 @@ The specific questions we would like to answer are as follow:
 
 In this hands-on exercise, five R packages will be used, they are:
 
++-------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Package                                                           | Description                                                                                                                                                                                      |
-|-------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
++===================================================================+==================================================================================================================================================================================================+
 | [**sf**](https://r-spatial.github.io/sf/)                         | To import, manage and process vector-based geospatial data in R                                                                                                                                  |
++-------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | [**spatstat**](https://spatstat.org/)                             | For point pattern analysis. In this hands-on exercise, it will be used to perform 1st- and 2nd-order spatial point patterns analysis and derive kernel density estimation (KDE) layer.           |
++-------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | [**raster**](https://cran.r-project.org/web/packages/raster/)     | To read, write, manipulate, analyse and model of gridded spatial data (i.e. raster). In this hands-on exercise, it will be used to convert image output generate by spatstat into raster format. |
++-------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | [**maptools**](https://cran.r-project.org/web/packages/maptools/) | Provides a set of tools for manipulating geographic data. In this hands-on exercise, we mainly use it to convert *Spatial* objects into *ppp* format of **spatstat**.                            |
++-------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | [**tmap**](https://cran.r-project.org/web/packages/tmap/)         | For thematic mapping; provides functions for plotting cartographic quality static point patterns maps or interactive maps by using [leaflet](https://leafletjs.com/) API                         |
++-------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : {tbl-colwidths="\[15,85\]"}
 
@@ -75,30 +81,30 @@ pacman::p_load(sf, tmap, spatstat, maptools, raster)
 
 The following public datasets are used:
 
-+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+---+---+
-| Type       | Details                                                                                                                                                                      | Screenshot                             |   |   |
-+============+==============================================================================================================================================================================+========================================+===+===+
-| Geospatial | [**Child Care Services Web**](https://beta.data.gov.sg/datasets?query=child+care&resultId=d_5d668e3f544335f8028f546827b773b4)                                                | ![](images/childcare.PNG){width="600"} |   |   |
-|            |                                                                                                                                                                              |                                        |   |   |
-|            | ***Point feature*** data providing both location and attribute information of childcare centres.                                                                             |                                        |   |   |
-|            |                                                                                                                                                                              |                                        |   |   |
-|            | *Source: data.gov.sg\                                                                                                                                                        |                                        |   |   |
-|            | Format: GEOJSON*                                                                                                                                                             |                                        |   |   |
-+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+---+---+
-| Geospatial | [**Master Plan 2014 Subzone Boundary Web**](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9) | ![](images/MPSZ_SHP.PNG){width="600"}  |   |   |
-|            |                                                                                                                                                                              |                                        |   |   |
-|            | Consists of the geographical boundary of Singapore at the planning subzone level. The data is based on URA Master Plan 2014.                                                 |                                        |   |   |
-|            |                                                                                                                                                                              |                                        |   |   |
-|            | *Source: data.gov.sg\                                                                                                                                                        |                                        |   |   |
-|            | Format: SHP (ESRI Shapefile)*                                                                                                                                                |                                        |   |   |
-+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+---+---+
-| Geospatial | **Coastal Outline**                                                                                                                                                          |                                        |   |   |
-|            |                                                                                                                                                                              |                                        |   |   |
-|            | ***Polygon feature*** data showing the national boundary of Singapore.                                                                                                       |                                        |   |   |
-|            |                                                                                                                                                                              |                                        |   |   |
-|            | *Source: SLA\                                                                                                                                                                |                                        |   |   |
-|            | Format: SHP (ESRI Shapefile)*                                                                                                                                                |                                        |   |   |
-+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+---+---+
++------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+------+------+
+| Type       | Details                                                                                                                                                                      | Screenshot                             |      |      |
++============+==============================================================================================================================================================================+========================================+======+======+
+| Geospatial | [**Child Care Services Web**](https://beta.data.gov.sg/datasets?query=child+care&resultId=d_5d668e3f544335f8028f546827b773b4)                                                | ![](images/childcare.PNG){width="600"} |      |      |
+|            |                                                                                                                                                                              |                                        |      |      |
+|            | ***Point feature*** data providing both location and attribute information of childcare centres.                                                                             |                                        |      |      |
+|            |                                                                                                                                                                              |                                        |      |      |
+|            | *Source: data.gov.sg\                                                                                                                                                        |                                        |      |      |
+|            | Format: GEOJSON*                                                                                                                                                             |                                        |      |      |
++------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+------+------+
+| Geospatial | [**Master Plan 2014 Subzone Boundary Web**](https://beta.data.gov.sg/datasets?query=Master+Plan+2014+Subzone+Boundary+%28Web%29&resultId=d_d14da225fccf921049ab64238ff473d9) | ![](images/MPSZ_SHP.PNG){width="600"}  |      |      |
+|            |                                                                                                                                                                              |                                        |      |      |
+|            | Consists of the geographical boundary of Singapore at the planning subzone level. The data is based on URA Master Plan 2014.                                                 |                                        |      |      |
+|            |                                                                                                                                                                              |                                        |      |      |
+|            | *Source: data.gov.sg\                                                                                                                                                        |                                        |      |      |
+|            | Format: SHP (ESRI Shapefile)*                                                                                                                                                |                                        |      |      |
++------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+------+------+
+| Geospatial | **Coastal Outline**                                                                                                                                                          |                                        |      |      |
+|            |                                                                                                                                                                              |                                        |      |      |
+|            | ***Polygon feature*** data showing the national boundary of Singapore.                                                                                                       |                                        |      |      |
+|            |                                                                                                                                                                              |                                        |      |      |
+|            | *Source: SLA\                                                                                                                                                                |                                        |      |      |
+|            | Format: SHP (ESRI Shapefile)*                                                                                                                                                |                                        |      |      |
++------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+------+------+
 
 ## Importing Spatial Data
 
@@ -544,7 +550,7 @@ plot(kde_childcareSG.bw)
 
 Now we notice the output image looks identical to the earlier version, the only changes in the data values (refer to the legend).
 
-## 6.2 Working with different automatic badwidth methods
+## 6.2 Working with different automatic bandwidth methods
 
 Beside `bw.diggle()`, there are 3 other **spatstat** functions can be used to determine the bandwidth, they are: `bw.CvL()`, `bw.scott()`, and `bw.ppl()`.
 

@@ -1,0 +1,55 @@
+---
+title: "In-class Exercise 2 (WIP)"
+title-block-banner: true
+date: "02-Sep-24"
+date-modified: "last-modified"
+toc: true
+toc-depth: 4
+editor: visual
+execute: 
+  freeze: true #never re-render during project render
+  echo: true #if false, displays charts without codes
+  eval: true #if false, displays codes without charts
+  warning: false #dont display if there are any warnings
+format: 
+  html:
+    code-fold: false
+    code-overflow: scroll
+    code-summary: "Show the code"
+    code-line-numbers: false
+---
+
+![](images/placeholder.PNG){fig-align="center"}
+
+# 1 Overview
+
+# 2 The Packages
+
+::: panel-tabset
+## Packages
+
+| Package                                                                                                                                   | Usage                                                                                                                                                                                                                                                                                                          |
+|---------------------------|---------------------------------------------|
+| [**olsrr**](https://olsrr.rsquaredacademy.com/)                                                                                           | For building OLS and performing diagnostics tests. Enhances the capabilities of the basic linear modeling functionality and provides a comprehensive set of regression diagnostics, model comparisons, and other statistics, including normality of residuals, homoscedasticity, and influential observations. |
+| [**GWmodel**](https://cran.r-project.org/web/packages/GWmodel/)                                                                           | For calibrating geographical weighted family of models                                                                                                                                                                                                                                                         |
+| [**corrplot**](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html)                                            | For multivariate data visualisation and analysis, particularly to visualise correlation matrix.                                                                                                                                                                                                                |
+| [**ggpubr**](https://rpkgs.datanovia.com/ggpubr/)                                                                                         | For some easy-to-use functions for creating and customizing 'ggplot2'- based publication ready plots.                                                                                                                                                                                                          |
+| [**sf**](https://cran.r-project.org/web/packages/sf/index.html)                                                                           | For spatial data handling.                                                                                                                                                                                                                                                                                     |
+| [**tmap**](https://cran.r-project.org/web/packages/tmap/)                                                                                 | Choropleth mapping; thematic maps                                                                                                                                                                                                                                                                              |
+| [**tidyverse**](https://www.tidyverse.org/)                                                                                               | Attribute data handling                                                                                                                                                                                                                                                                                        |
+| [**gtsummary**](https://www.danieldsjoberg.com/gtsummary/)                                                                                | Summarises data sets, regression models, and more, using sensible defaults with highly customisable capabilities.                                                                                                                                                                                              |
+| [**DT**](https://rstudio.github.io/DT/), [**knitr**](https://yihui.org/knitr/), [**kableExtra**](https://haozhu233.github.io/kableExtra/) | For building tables                                                                                                                                                                                                                                                                                            |
+
+: {tbl-colwidths="\[20,80\]"}
+
+## Code
+
+```{r}
+pacman::p_load(olsrr, GWmodel, corrplot, 
+               ggpubr, sf, spdep, 
+               tmap, tidyverse, gtsummary,
+               DT, knitr, kableExtra)
+```
+:::
+
+# 3 The Data
