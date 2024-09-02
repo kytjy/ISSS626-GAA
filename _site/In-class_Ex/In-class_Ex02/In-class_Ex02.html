@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2024-09-02">
 
-<title>we could go anywhere - In-class Exercise 2 (WIP)</title>
+<title>we could go anywhere - In-class Exercise 2: Thailand Road Accident Case Study</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -268,7 +268,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">In-class Exercise 2 (WIP)</h1>
+      <h1 class="title">In-class Exercise 2: Thailand Road Accident Case Study</h1>
                       </div>
   </div>
     
@@ -301,9 +301,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1 Overview</a></li>
-  <li><a href="#the-packages" id="toc-the-packages" class="nav-link" data-scroll-target="#the-packages">2 The Packages</a></li>
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">3 The Data</a></li>
+  <li><a href="#requirements" id="toc-requirements" class="nav-link active" data-scroll-target="#requirements">Requirements</a></li>
+  <li><a href="#the-packages" id="toc-the-packages" class="nav-link" data-scroll-target="#the-packages">The Packages</a></li>
+  <li><a href="#loading-the-data" id="toc-loading-the-data" class="nav-link" data-scroll-target="#loading-the-data">Loading the Data</a>
+  <ul>
+  <li><a href="#traffic-accident-data" id="toc-traffic-accident-data" class="nav-link" data-scroll-target="#traffic-accident-data">Traffic Accident Data</a></li>
+  <li><a href="#administrative-boundary" id="toc-administrative-boundary" class="nav-link" data-scroll-target="#administrative-boundary">Administrative Boundary</a></li>
+  <li><a href="#thai-roads" id="toc-thai-roads" class="nav-link" data-scroll-target="#thai-roads">Thai Roads</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -313,86 +318,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/placeholder.PNG" class="img-fluid figure-img"></p>
-</figure>
-</div>
-<section id="overview" class="level1">
-<h1>1 Overview</h1>
+<section id="requirements" class="level1">
+<h1>Requirements</h1>
+<ul>
+<li>Check units of measurement in projected coordinates system</li>
+</ul>
 </section>
 <section id="the-packages" class="level1">
-<h1>2 The Packages</h1>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Packages</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Code</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<table class="table">
-<colgroup>
-<col style="width: 20%">
-<col style="width: 80%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Package</th>
-<th>Usage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="https://olsrr.rsquaredacademy.com/"><strong>olsrr</strong></a></td>
-<td>For building OLS and performing diagnostics tests. Enhances the capabilities of the basic linear modeling functionality and provides a comprehensive set of regression diagnostics, model comparisons, and other statistics, including normality of residuals, homoscedasticity, and influential observations.</td>
-</tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/GWmodel/"><strong>GWmodel</strong></a></td>
-<td>For calibrating geographical weighted family of models</td>
-</tr>
-<tr class="odd">
-<td><a href="https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html"><strong>corrplot</strong></a></td>
-<td>For multivariate data visualisation and analysis, particularly to visualise correlation matrix.</td>
-</tr>
-<tr class="even">
-<td><a href="https://rpkgs.datanovia.com/ggpubr/"><strong>ggpubr</strong></a></td>
-<td>For some easy-to-use functions for creating and customizing ‘ggplot2’- based publication ready plots.</td>
-</tr>
-<tr class="odd">
-<td><a href="https://cran.r-project.org/web/packages/sf/index.html"><strong>sf</strong></a></td>
-<td>For spatial data handling.</td>
-</tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/tmap/"><strong>tmap</strong></a></td>
-<td>Choropleth mapping; thematic maps</td>
-</tr>
-<tr class="odd">
-<td><a href="https://www.tidyverse.org/"><strong>tidyverse</strong></a></td>
-<td>Attribute data handling</td>
-</tr>
-<tr class="even">
-<td><a href="https://www.danieldsjoberg.com/gtsummary/"><strong>gtsummary</strong></a></td>
-<td>Summarises data sets, regression models, and more, using sensible defaults with highly customisable capabilities.</td>
-</tr>
-<tr class="odd">
-<td><a href="https://rstudio.github.io/DT/"><strong>DT</strong></a>, <a href="https://yihui.org/knitr/"><strong>knitr</strong></a>, <a href="https://haozhu233.github.io/kableExtra/"><strong>kableExtra</strong></a></td>
-<td>For building tables</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<h1>The Packages</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(olsrr, GWmodel, corrplot, </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               ggpubr, sf, spdep, </span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               tmap, tidyverse, gtsummary,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               DT, knitr, kableExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="loading-the-data" class="level1">
+<h1>Loading the Data</h1>
+<section id="traffic-accident-data" class="level2">
+<h2 class="anchored" data-anchor-id="traffic-accident-data">Traffic Accident Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/geospatial/thai_road_accident_2019_2022.csv"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(longitude) <span class="sc">&amp;</span> longitude <span class="sc">!=</span> <span class="st">""</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">is.na</span>(latitude) <span class="sc">&amp;</span> latitude <span class="sc">!=</span><span class="st">""</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"longitude"</span>, <span class="st">"latitude"</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">32647</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="administrative-boundary" class="level2">
+<h2 class="anchored" data-anchor-id="administrative-boundary">Administrative Boundary</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>adminboundary <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">layer =</span> <span class="st">"geoBoundaries-THA-ADM0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `geoBoundaries-THA-ADM0' from data source 
+  `C:\kytjy\ISSS626-GAA\In-class_Ex\In-class_Ex02\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 1 feature and 5 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 97.34381 ymin: 5.612851 xmax: 105.6368 ymax: 20.46483
+Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">bg =</span> <span class="st">'#E4D5C9'</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(adminboundary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="In-class_Ex02_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="the-data" class="level1">
-<h1>3 The Data</h1>
+<section id="thai-roads" class="level2">
+<h2 class="anchored" data-anchor-id="thai-roads">Thai Roads</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>roads <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">layer =</span> <span class="st">"hotosm_tha_roads_lines_shp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `hotosm_tha_roads_lines_shp' from data source 
+  `C:\kytjy\ISSS626-GAA\In-class_Ex\In-class_Ex02\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 2792590 features and 14 fields
+Geometry type: MULTILINESTRING
+Dimension:     XY
+Bounding box:  xmin: 97.34457 ymin: 5.643645 xmax: 105.6528 ymax: 20.47168
+CRS:           NA</code></pre>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
