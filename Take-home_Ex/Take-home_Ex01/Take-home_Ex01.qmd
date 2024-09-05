@@ -1,0 +1,154 @@
+---
+title: "Take-home Exercise 1: Understanding and Analysing Thailand Road Accident Data"
+title-block-banner: true
+date: "05-Sep-23"
+date-modified: "last-modified"
+toc: true
+toc-depth: 4
+editor: visual
+execute: 
+  freeze: true #never re-render during project render
+  echo: true #if false, displays charts without codes
+  eval: true #if false, displays codes without charts
+  warning: false #dont display if there are any warnings
+format: 
+  html:
+    code-fold: false
+    code-overflow: scroll
+    code-summary: "Show the code"
+    code-line-numbers: false
+---
+
+# 1 Thailand's Killer Roads
+
+Road traffic injuries pose a significant public health issue in Thailand, with a high number of fatalities, injuries, and disabilities each year. These incidents have a profound impact not only on the victims and their families but also on society and the nation as a whole. According to the World Health Organization (WHO), approximately 20,000 people lose their lives in road accidents annually, equating to about 56 deaths each day.
+
+Despite numerous government initiatives aimed at reducing road casualties, the numbers have shown little improvement. Key barriers such as reckless driving, limited public awareness, weak law enforcement, and challenges with road infrastructure have been consistently identified as the main hurdles. Current efforts to enhance road safety have had minimal effect.
+
+As road safety remains a national priority, it is crucial to conduct a comprehensive study of the factors contributing to road accidents. By analysing this data, we aim to accurately determine the leading causes of accidents and offer valuable insights that can inform policies and investments in effective solutions to improve road safety.
+
+# 2 Getting Started
+
+## 2.1 Loading Packages
+
+In this exercise, we will be using the following packages:
+
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+| Package                                                                                                                                          | Description                                           |
++==================================================================================================================================================+=======================================================+
+| [**sf**](https://r-spatial.github.io/sf/)                                                                                                        | For importing, managing, and handling geospatial data |
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+| [**sfdep**](https://sfdep.josiahparry.com/)                                                                                                      | Used to compute spatial weights                       |
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+| [**tmap**](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html)                                                          | For thematic mapping                                  |
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+| [**leaflet**](https://rstudio.github.io/leaflet/)                                                                                                | For interactive maps                                  |
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+| [**tidyverse**](https://www.tidyverse.org/)                                                                                                      | For non-spatial data wrangling                        |
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+| [**DT**](https://rstudio.github.io/DT/)**, [knitr](https://yihui.org/knitr/), [kableExtra](https://haozhu233.github.io/kableExtra/)**, gtsummary | For building tables                                   |
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+| [**plotly**](https://github.com/plotly/plotly.py)                                                                                                | To create interactive plots                           |
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+|                                                                                                                                                  |                                                       |
++--------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+
+
+: {tbl-colwidths="\[20,80\]"}
+
+The following code chunk uses `p_load()` of **pacman** package to check if the aforementioned packages are installed in the computer. If they are, the libraries will be called into R.
+
+```{r}
+pacman::p_load(sf, sfdep,
+               tmap, leaflet,
+               tidyverse,
+               DT, knitr, kableExtra, gtsummary,
+               plotly)
+```
+
+## 2.2 The Data
+
+### 2.2.1 Data Sources
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
+| File                                                                                                                                                   | Source                     | Screenshot                       |
++========================================================================================================================================================+============================+==================================+
+| [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-thailand), *in SHP file format* | Humanitarian Data Exchange | ![](images/adminboundaries.PNG)  |
+|                                                                                                                                                        |                            |                                  |
+|                                                                                                                                                        |                            | ![](images/adminboundaries2.PNG) |
++--------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
+| [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads), *in SHP file format*                                       | Humanitarian Data Exchange | ![](images/roads.PNG)            |
+|                                                                                                                                                        |                            |                                  |
+|                                                                                                                                                        |                            | ![](images/roads2.PNG)           |
++--------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
+| [Thailand Road Accident \[2019-2022\]](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022), *in CSV format*                 | Kaggle                     | ![](images/roadacc.PNG)          |
+|                                                                                                                                                        |                            |                                  |
+| This dataset provides a comprehensive statistics on recorded road accidents in Thailand from 2019 to 2022.                                             |                            |                                  |
++--------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
+
+: {tbl-colwidths="\[15,20,65\]"}
+
+### 2.2.2 Importing Datasets
+
+::: panel-tabset
+## Traffic Accident Data
+
+```{r}
+accidents <- read_csv("data/geospatial/thai_road_accident_2019_2022.csv")
+```
+
+```{r}
+glimpse(accidents)
+```
+
+```{r}
+accidents <- accidents %>% 
+  select(-c(province_th, route))
+```
+
+
+```{r}
+#| echo: false
+theme_gtsummary_compact()
+
+accidents %>% 
+  tbl_summary(missing_text = "NA") %>% 
+  add_n() %>% 
+  modify_caption("**Table of Variable Summary**") %>%
+  bold_labels()
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+-   In terms of data health, we can see that there are 359 missing records in the *latitude* and *longitude* columns. Since these missing records make up <5% of the 81,735 total road accidents recorded, we can remove these from our data set.
+-   We can use *latitude* and *longitude* columns to transform the coordinates into CRS using `st_as_af()`. 
+-   Thailand adopts [EPSG: 32647](https://epsg.io/32647), which is in metres.
+
+:::
+
+
+## Administrative Boundary
+
+```{r}
+adminboundary <- st_read(dsn = "data/geospatial", 
+                layer = "geoBoundaries-THA-ADM0")
+```
+
+```{r}
+st_crs(adminboundary)
+```
+
+
+
+## Road Lines
+
+```{r}
+roads <- st_read(dsn = "data/geospatial", 
+                layer = "hotosm_tha_roads_lines_shp")
+```
+```{r}
+st_crs(roads)
+```
+
+
+:::

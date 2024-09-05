@@ -1258,5 +1258,26 @@
     "title": "In-class Exercise 2: Importing Data for Thailand Road Accident Case Study",
     "section": "2.3 Thai Roads",
     "text": "2.3 Thai Roads\n\nroads &lt;- st_read(dsn = \"data/geospatial\", \n                layer = \"hotosm_tha_roads_lines_shp\")\n\nReading layer `hotosm_tha_roads_lines_shp' from data source \n  `C:\\kytjy\\ISSS626-GAA\\In-class_Ex\\In-class_Ex02\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 2792590 features and 14 fields\nGeometry type: MULTILINESTRING\nDimension:     XY\nBounding box:  xmin: 97.34457 ymin: 5.643645 xmax: 105.6528 ymax: 20.47168\nCRS:           NA"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html",
+    "href": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html",
+    "title": "Take-home Exercise 1: Understanding and Analysing Thailand Road Accident Data",
+    "section": "",
+    "text": "Road traffic injuries pose a significant public health issue in Thailand, with a high number of fatalities, injuries, and disabilities each year. These incidents have a profound impact not only on the victims and their families but also on society and the nation as a whole. According to the World Health Organization (WHO), approximately 20,000 people lose their lives in road accidents annually, equating to about 56 deaths each day.\nDespite numerous government initiatives aimed at reducing road casualties, the numbers have shown little improvement. Key barriers such as reckless driving, limited public awareness, weak law enforcement, and challenges with road infrastructure have been consistently identified as the main hurdles. Current efforts to enhance road safety have had minimal effect.\nAs road safety remains a national priority, it is crucial to conduct a comprehensive study of the factors contributing to road accidents. By analysing this data, we aim to accurately determine the leading causes of accidents and offer valuable insights that can inform policies and investments in effective solutions to improve road safety."
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#loading-packages",
+    "href": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#loading-packages",
+    "title": "Take-home Exercise 1: Understanding and Analysing Thailand Road Accident Data",
+    "section": "2.1 Loading Packages",
+    "text": "2.1 Loading Packages\nIn this exercise, we will be using the following packages:\n\n\n\n\n\n\n\nPackage\nDescription\n\n\n\n\nsf\nFor importing, managing, and handling geospatial data\n\n\nsfdep\nUsed to compute spatial weights\n\n\ntmap\nFor thematic mapping\n\n\nleaflet\nFor interactive maps\n\n\ntidyverse\nFor non-spatial data wrangling\n\n\nDT, knitr, kableExtra\nFor building tables\n\n\nplotly\nTo create interactive plots\n\n\n\n\n\n\n\nThe following code chunk uses p_load() of pacman package to check if the aforementioned packages are installed in the computer. If they are, the libraries will be called into R.\n\npacman::p_load(sf, sfdep,\n               tmap, leaflet,\n               tidyverse,\n               DT, knitr, kableExtra, \n               plotly)"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#the-data",
+    "href": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#the-data",
+    "title": "Take-home Exercise 1: Understanding and Analysing Thailand Road Accident Data",
+    "section": "2.2 The Data",
+    "text": "2.2 The Data\n\n2.2.1 Data Sources\n\n\n\n\n\n\n\n\nFile\nSource\nScreenshot\n\n\n\n\nThailand - Subnational Administrative Boundaries, in SHP file format\nHumanitarian Data Exchange\n\n\n\n\nThailand Roads (OpenStreetMap Export), in SHP file format\nHumanitarian Data Exchange\n\n\n\n\nThailand Road Accident [2019-2022], in CSV format\nThis dataset provides a comprehensive statistics on recorded road accidents in Thailand from 2019 to 2022.\nKaggle"
   }
 ]
