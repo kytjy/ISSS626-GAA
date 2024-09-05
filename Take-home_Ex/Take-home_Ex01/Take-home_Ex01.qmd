@@ -121,8 +121,8 @@ accidents %>%
 **Observations**
 
 -   In terms of data health, we can see that there are 359 missing records in the *latitude* and *longitude* columns. Since these missing records make up <5% of the 81,735 total road accidents recorded, we can remove these from our data set.
--   We can use *latitude* and *longitude* columns to transform the coordinates into CRS using `st_as_af()`. 
--   Thailand adopts [EPSG: 32647](https://epsg.io/32647), which is in metres.
+-   We can use *latitude* and *longitude* columns to transform the coordinates into CRS. The EPSG code for latitude-longitude projection is [4326](https://epsg.io/4326). 
+-   Thailand adopts EPSG [32647](https://epsg.io/32647), which is in metres.
 
 :::
 
