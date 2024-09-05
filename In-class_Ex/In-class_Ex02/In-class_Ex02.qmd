@@ -1,5 +1,5 @@
 ---
-title: "In-class Exercise 2: Thailand Road Accident Case Study"
+title: "In-class Exercise 2: Importing Data for Thailand Road Accident Case Study"
 title-block-banner: true
 date: "02-Sep-24"
 date-modified: "last-modified"
@@ -19,21 +19,24 @@ format:
     code-line-numbers: false
 ---
 
+::: {.lightbox .light data-latex="light"}
 
-# Requirements
+**Reminders**
 
--   Check units of measurement in projected coordinates system
+Check units of measurement in projected coordinates system
 
-# The Packages
+:::
+
+# 1 The Packages
 
 ```{r}
 pacman::p_load(sf, tmap, tidyverse)
 ```
 
-# Loading the Data
+# 2 Loading the Data
 
 
-## Traffic Accident Data
+## 2.1 Traffic Accident Data
 
 ```{r}
 rdacc_sf <- read_csv("data/geospatial/thai_road_accident_2019_2022.csv") %>%
@@ -45,7 +48,7 @@ rdacc_sf <- read_csv("data/geospatial/thai_road_accident_2019_2022.csv") %>%
   st_transform(crs = 32647)
 ```
 
-## Administrative Boundary
+## 2.1 Administrative Boundary
 
 ```{r}
 adminboundary <- st_read(dsn = "data/geospatial", 
@@ -59,7 +62,7 @@ plot(adminboundary)
 ```
 
 
-## Thai Roads
+## 2.3 Thai Roads
 
 ```{r}
 roads <- st_read(dsn = "data/geospatial", 

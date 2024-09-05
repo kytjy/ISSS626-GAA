@@ -893,7 +893,7 @@
     "href": "index.html",
     "title": "we could go anywhere",
     "section": "",
-    "text": "In-class Exercise 2: Thailand Road Accident Case Study\n\n\n\n\n\n\n\n\n\n\n\n\nSep 2, 2024\n\n\n\n\n\n\n  \n\n\n\n\nHands-on Exercise 8: Geographically Weighted Predictive Models\n\n\n\n\n\n\n\n\n\n\n\n\nAug 31, 2024\n\n\n\n\n\n\n  \n\n\n\n\nHands-on Exercise 7: Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method\n\n\n\n\n\n\n\n\n\n\n\n\nAug 29, 2024\n\n\n\n\n\n\n  \n\n\n\n\nIn-class Exercise 1: Geospatial Data Science with R\n\n\n\n\n\n\n\n\n\n\n\n\nAug 26, 2024\n\n\n\n\n\n\n  \n\n\n\n\nHands-on Exercise 6: Geographical Segmentation with Spatially Constrained Clustering Techniques\n\n\n\n\n\n\n\n\n\n\n\n\nAug 19, 2024\n\n\n\n\n\n\nNo matching items"
+    "text": "In-class Exercise 2: Importing Data for Thailand Road Accident Case Study\n\n\n\n\n\n\n\n\n\n\n\n\nSep 2, 2024\n\n\n\n\n\n\n  \n\n\n\n\nHands-on Exercise 8: Geographically Weighted Predictive Models\n\n\n\n\n\n\n\n\n\n\n\n\nAug 31, 2024\n\n\n\n\n\n\n  \n\n\n\n\nHands-on Exercise 7: Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method\n\n\n\n\n\n\n\n\n\n\n\n\nAug 29, 2024\n\n\n\n\n\n\n  \n\n\n\n\nIn-class Exercise 1: Geospatial Data Science with R\n\n\n\n\n\n\n\n\n\n\n\n\nAug 26, 2024\n\n\n\n\n\n\n  \n\n\n\n\nHands-on Exercise 6: Geographical Segmentation with Spatially Constrained Clustering Techniques\n\n\n\n\n\n\n\n\n\n\n\n\nAug 19, 2024\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex01/In-class_Ex01.html#import-pre-school-locations",
@@ -1234,29 +1234,29 @@
   {
     "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html",
     "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html",
-    "title": "In-class Exercise 2: Thailand Road Accident Case Study",
+    "title": "In-class Exercise 2: Importing Data for Thailand Road Accident Case Study",
     "section": "",
-    "text": "Check units of measurement in projected coordinates system"
+    "text": "Reminders\nCheck units of measurement in projected coordinates system"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#traffic-accident-data",
     "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#traffic-accident-data",
-    "title": "In-class Exercise 2: Thailand Road Accident Case Study",
-    "section": "Traffic Accident Data",
-    "text": "Traffic Accident Data\n\nrdacc_sf &lt;- read_csv(\"data/geospatial/thai_road_accident_2019_2022.csv\") %&gt;%\n  filter(!is.na(longitude) & longitude != \"\",\n         !is.na(latitude) & latitude !=\"\") %&gt;% \n  st_as_sf(coords = c(\n    \"longitude\", \"latitude\"),\n    crs = 4326) %&gt;% \n  st_transform(crs = 32647)"
+    "title": "In-class Exercise 2: Importing Data for Thailand Road Accident Case Study",
+    "section": "2.1 Traffic Accident Data",
+    "text": "2.1 Traffic Accident Data\n\nrdacc_sf &lt;- read_csv(\"data/geospatial/thai_road_accident_2019_2022.csv\") %&gt;%\n  filter(!is.na(longitude) & longitude != \"\",\n         !is.na(latitude) & latitude !=\"\") %&gt;% \n  st_as_sf(coords = c(\n    \"longitude\", \"latitude\"),\n    crs = 4326) %&gt;% \n  st_transform(crs = 32647)"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#administrative-boundary",
     "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#administrative-boundary",
-    "title": "In-class Exercise 2: Thailand Road Accident Case Study",
-    "section": "Administrative Boundary",
-    "text": "Administrative Boundary\n\nadminboundary &lt;- st_read(dsn = \"data/geospatial\", \n                layer = \"geoBoundaries-THA-ADM0\")\n\nReading layer `geoBoundaries-THA-ADM0' from data source \n  `C:\\kytjy\\ISSS626-GAA\\In-class_Ex\\In-class_Ex02\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 1 feature and 5 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 97.34381 ymin: 5.612851 xmax: 105.6368 ymax: 20.46483\nGeodetic CRS:  WGS 84\n\n\n\npar(bg = '#E4D5C9')\n\nplot(adminboundary)"
+    "title": "In-class Exercise 2: Importing Data for Thailand Road Accident Case Study",
+    "section": "2.1 Administrative Boundary",
+    "text": "2.1 Administrative Boundary\n\nadminboundary &lt;- st_read(dsn = \"data/geospatial\", \n                layer = \"geoBoundaries-THA-ADM0\")\n\nReading layer `geoBoundaries-THA-ADM0' from data source \n  `C:\\kytjy\\ISSS626-GAA\\In-class_Ex\\In-class_Ex02\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 1 feature and 5 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 97.34381 ymin: 5.612851 xmax: 105.6368 ymax: 20.46483\nGeodetic CRS:  WGS 84\n\n\n\npar(bg = '#E4D5C9')\n\nplot(adminboundary)"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#thai-roads",
     "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#thai-roads",
-    "title": "In-class Exercise 2: Thailand Road Accident Case Study",
-    "section": "Thai Roads",
-    "text": "Thai Roads\n\nroads &lt;- st_read(dsn = \"data/geospatial\", \n                layer = \"hotosm_tha_roads_lines_shp\")\n\nReading layer `hotosm_tha_roads_lines_shp' from data source \n  `C:\\kytjy\\ISSS626-GAA\\In-class_Ex\\In-class_Ex02\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 2792590 features and 14 fields\nGeometry type: MULTILINESTRING\nDimension:     XY\nBounding box:  xmin: 97.34457 ymin: 5.643645 xmax: 105.6528 ymax: 20.47168\nCRS:           NA"
+    "title": "In-class Exercise 2: Importing Data for Thailand Road Accident Case Study",
+    "section": "2.3 Thai Roads",
+    "text": "2.3 Thai Roads\n\nroads &lt;- st_read(dsn = \"data/geospatial\", \n                layer = \"hotosm_tha_roads_lines_shp\")\n\nReading layer `hotosm_tha_roads_lines_shp' from data source \n  `C:\\kytjy\\ISSS626-GAA\\In-class_Ex\\In-class_Ex02\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 2792590 features and 14 fields\nGeometry type: MULTILINESTRING\nDimension:     XY\nBounding box:  xmin: 97.34457 ymin: 5.643645 xmax: 105.6528 ymax: 20.47168\nCRS:           NA"
   }
 ]

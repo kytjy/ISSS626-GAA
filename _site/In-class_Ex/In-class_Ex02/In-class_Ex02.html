@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2024-09-02">
 
-<title>we could go anywhere - In-class Exercise 2: Thailand Road Accident Case Study</title>
+<title>we could go anywhere - In-class Exercise 2: Importing Data for Thailand Road Accident Case Study</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -268,7 +268,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">In-class Exercise 2: Thailand Road Accident Case Study</h1>
+      <h1 class="title">In-class Exercise 2: Importing Data for Thailand Road Accident Case Study</h1>
                       </div>
   </div>
     
@@ -286,7 +286,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">September 2, 2024</p>
+        <p class="date-modified">September 5, 2024</p>
       </div>
     </div>
       
@@ -301,13 +301,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#requirements" id="toc-requirements" class="nav-link active" data-scroll-target="#requirements">Requirements</a></li>
-  <li><a href="#the-packages" id="toc-the-packages" class="nav-link" data-scroll-target="#the-packages">The Packages</a></li>
-  <li><a href="#loading-the-data" id="toc-loading-the-data" class="nav-link" data-scroll-target="#loading-the-data">Loading the Data</a>
+  <li><a href="#the-packages" id="toc-the-packages" class="nav-link active" data-scroll-target="#the-packages">1 The Packages</a></li>
+  <li><a href="#loading-the-data" id="toc-loading-the-data" class="nav-link" data-scroll-target="#loading-the-data">2 Loading the Data</a>
   <ul>
-  <li><a href="#traffic-accident-data" id="toc-traffic-accident-data" class="nav-link" data-scroll-target="#traffic-accident-data">Traffic Accident Data</a></li>
-  <li><a href="#administrative-boundary" id="toc-administrative-boundary" class="nav-link" data-scroll-target="#administrative-boundary">Administrative Boundary</a></li>
-  <li><a href="#thai-roads" id="toc-thai-roads" class="nav-link" data-scroll-target="#thai-roads">Thai Roads</a></li>
+  <li><a href="#traffic-accident-data" id="toc-traffic-accident-data" class="nav-link" data-scroll-target="#traffic-accident-data">2.1 Traffic Accident Data</a></li>
+  <li><a href="#administrative-boundary" id="toc-administrative-boundary" class="nav-link" data-scroll-target="#administrative-boundary">2.1 Administrative Boundary</a></li>
+  <li><a href="#thai-roads" id="toc-thai-roads" class="nav-link" data-scroll-target="#thai-roads">2.3 Thai Roads</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -318,22 +317,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="requirements" class="level1">
-<h1>Requirements</h1>
-<ul>
-<li>Check units of measurement in projected coordinates system</li>
-</ul>
-</section>
+<div class="lightbox light">
+<p><strong>Reminders</strong></p>
+<p>Check units of measurement in projected coordinates system</p>
+</div>
 <section id="the-packages" class="level1">
-<h1>The Packages</h1>
+<h1>1 The Packages</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="loading-the-data" class="level1">
-<h1>Loading the Data</h1>
+<h1>2 Loading the Data</h1>
 <section id="traffic-accident-data" class="level2">
-<h2 class="anchored" data-anchor-id="traffic-accident-data">Traffic Accident Data</h2>
+<h2 class="anchored" data-anchor-id="traffic-accident-data">2.1 Traffic Accident Data</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rdacc_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/geospatial/thai_road_accident_2019_2022.csv"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(longitude) <span class="sc">&amp;</span> longitude <span class="sc">!=</span> <span class="st">""</span>,</span>
@@ -345,7 +342,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 <section id="administrative-boundary" class="level2">
-<h2 class="anchored" data-anchor-id="administrative-boundary">Administrative Boundary</h2>
+<h2 class="anchored" data-anchor-id="administrative-boundary">2.1 Administrative Boundary</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>adminboundary <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">layer =</span> <span class="st">"geoBoundaries-THA-ADM0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -370,7 +367,7 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </section>
 <section id="thai-roads" class="level2">
-<h2 class="anchored" data-anchor-id="thai-roads">Thai Roads</h2>
+<h2 class="anchored" data-anchor-id="thai-roads">2.3 Thai Roads</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>roads <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">layer =</span> <span class="st">"hotosm_tha_roads_lines_shp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
