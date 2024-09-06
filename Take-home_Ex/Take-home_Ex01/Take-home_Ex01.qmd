@@ -23,9 +23,13 @@ format:
 
 Road traffic injuries pose a significant public health issue in Thailand, with a high number of fatalities, injuries, and disabilities each year. These incidents have a profound impact not only on the victims and their families but also on society and the nation as a whole. According to the World Health Organization (WHO), approximately 20,000 people lose their lives in road accidents annually, equating to about 56 deaths each day.
 
-Despite numerous government initiatives aimed at reducing road casualties, the numbers have shown little improvement. Key barriers such as reckless driving, limited public awareness, weak law enforcement, and challenges with road infrastructure have been consistently identified as the main hurdles. Current efforts to enhance road safety have had minimal effect.
+Despite numerous government initiatives to reduce road casualties, the situation has seen minimal improvement. These issues underscore the need for a deeper understanding of road traffic accidents, which can be largely attributed to two primary factors: behavioral and environmental.
 
-As road safety remains a national priority, it is crucial to conduct a comprehensive study of the factors contributing to road accidents. By analysing this data, we aim to accurately determine the leading causes of accidents and offer valuable insights that can inform policies and investments in effective solutions to improve road safety.
+Behavioral factors, such as driver behavior and performance, are significant contributors to traffic accidents. These factors include driving style and skills, as well as direct and indirect driving behaviors. Environmental factors encompass conditions such as poor visibility during adverse weather (e.g., heavy rain or fog) and challenging road features (e.g., sharp bends, slippery slopes, and blind spots).
+
+Previous studies have highlighted the value of Spatial Point Patterns Analysis in examining road traffic accidents. However, these studies often focus solely on either behavioral or environmental factors, neglecting the influence of temporal factors such as season, day of the week, or time of day.
+
+In light of this, it is essential to investigate the factors affecting road traffic accidents in the Bangkok Metropolitan Region (BMR) using both spatial and spatio-temporal point patterns analysis methods. This approach aims to identify the leading causes of accidents and provide insights that can guide the development of effective policies and interventions to enhance road safety.
 
 # 2 Getting Started
 
@@ -69,28 +73,30 @@ pacman::p_load(sf, sfdep,
 
 ### 2.2.1 Data Sources
 
-+--------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
-| File                                                                                                                                                   | Source                     | Screenshot                       |
-+========================================================================================================================================================+============================+==================================+
-| [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-thailand), *in SHP file format* | Humanitarian Data Exchange | ![](images/adminboundaries.PNG)  |
-|                                                                                                                                                        |                            |                                  |
-|                                                                                                                                                        |                            | ![](images/adminboundaries2.PNG) |
-+--------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
-| [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads), *in SHP file format*                                       | Humanitarian Data Exchange | ![](images/roads.PNG)            |
-|                                                                                                                                                        |                            |                                  |
-|                                                                                                                                                        |                            | ![](images/roads2.PNG)           |
-+--------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
-| [Thailand Road Accident \[2019-2022\]](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022), *in CSV format*                 | Kaggle                     | ![](images/roadacc.PNG)          |
-|                                                                                                                                                        |                            |                                  |
-| This dataset provides a comprehensive statistics on recorded road accidents in Thailand from 2019 to 2022.                                             |                            |                                  |
-+--------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
+| File                                                                                                                                                                                            | Source                     | Screenshot                       |
++=================================================================================================================================================================================================+============================+==================================+
+| [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-thailand), *in SHP file format*                                          | Humanitarian Data Exchange | ![](images/adminboundaries.PNG)  |
+|                                                                                                                                                                                                 |                            |                                  |
+|                                                                                                                                                                                                 |                            | ![](images/adminboundaries2.PNG) |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
+| [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads), *in SHP file format*                                                                                | Humanitarian Data Exchange | ![](images/roads.PNG)            |
+|                                                                                                                                                                                                 |                            |                                  |
+|                                                                                                                                                                                                 |                            | ![](images/roads2.PNG)           |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
+| [Thailand Road Accident \[2019-2022\]](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022), *in CSV format*                                                          | Kaggle                     | ![](images/roadacc.PNG)          |
+|                                                                                                                                                                                                 |                            |                                  |
+| This dataset provides a comprehensive statistics on recorded road accidents in Thailand from 2019 to 2022, including time location, accident type, weather condition, and road characteristics. |                            |                                  |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
 
-: {tbl-colwidths="\[15,20,65\]"}
+: {tbl-colwidths="\[25,10,65\]"}
 
 ### 2.2.2 Importing Datasets
 
 ::: panel-tabset
 ## Traffic Accident Data
+
+`read_csv()` of the **readr** package allows us to import csv files into R Studio.
 
 ```{r}
 accidents <- read_csv("data/geospatial/thai_road_accident_2019_2022.csv")
@@ -100,11 +106,57 @@ accidents <- read_csv("data/geospatial/thai_road_accident_2019_2022.csv")
 glimpse(accidents)
 ```
 
+A quick look into the data using `glimpse()` reveals that there are 18 variables in the data, including:
+
++-------------------------------+--------------------------------------------------------------------------------+
+| Column Name                   | Description                                                                    |
++===============================+================================================================================+
+| *acc_code*                    | The accident code or identifier.                                               |
++-------------------------------+--------------------------------------------------------------------------------+
+| *incident_datetime*           | The date and time of the accident occurrence.                                  |
++-------------------------------+--------------------------------------------------------------------------------+
+| *report_datetime*             | The date and time when the accident was reported.                              |
++-------------------------------+--------------------------------------------------------------------------------+
+| *province_th*                 | The name of the province in Thailand, written in Thai.                         |
++-------------------------------+--------------------------------------------------------------------------------+
+| *province_en*                 | The name of the province in Thailand, written in English.                      |
++-------------------------------+--------------------------------------------------------------------------------+
+| *agency*                      | The government agency responsible for the road and traffic management.         |
++-------------------------------+--------------------------------------------------------------------------------+
+| *route*                       | The route or road segment where the accident occurred.                         |
++-------------------------------+--------------------------------------------------------------------------------+
+| *vehicle_type*                | The type of vehicle involved in the accident.                                  |
++-------------------------------+--------------------------------------------------------------------------------+
+| *presumed_cause*              | The presumed cause or reason for the accident.                                 |
++-------------------------------+--------------------------------------------------------------------------------+
+| *accident_type*               | The type of nature of the accident.                                            |
++-------------------------------+--------------------------------------------------------------------------------+
+| *number_of_vehicles_involved* | The number of vehicles involved in the accident.                               |
++-------------------------------+--------------------------------------------------------------------------------+
+| *number_of_fatalities*        | The number of fatalities resulting from the accident.                          |
++-------------------------------+--------------------------------------------------------------------------------+
+| *number_of_injuries*          | The number of injuries resulting from the accident.                            |
++-------------------------------+--------------------------------------------------------------------------------+
+| *weather_condition*           | The weather condition at the time of the accident.                             |
++-------------------------------+--------------------------------------------------------------------------------+
+| *latitude*                    | The latitude coordinate of the accident location.                              |
++-------------------------------+--------------------------------------------------------------------------------+
+| *longitude*                   | The longitude coordinate of the accident location.                             |
++-------------------------------+--------------------------------------------------------------------------------+
+| *road_description*            | The description of the road type or configuration where the accident occurred. |
++-------------------------------+--------------------------------------------------------------------------------+
+| *slope_description*           | The description of the slope condition at the accident location.               |
++-------------------------------+--------------------------------------------------------------------------------+
+
+: {tbl-colwidths="\[30,70\]"}
+
+Since the *province_th* and *route* columns are in Thai, I will remove them. The province column is already available in English, and the route information can be geocoded using the *latitude* and *longitude* columns.
+
 ```{r}
 accidents <- accidents %>% 
   select(-c(province_th, route))
 ```
-
+The **gtsummary** package provides us with descriptive statistics of the dataset and also includes the amount of missingness in each variable.
 
 ```{r}
 #| echo: false
@@ -120,11 +172,81 @@ accidents %>%
 ::: {.lightbox .light data-latex="light"}
 **Observations**
 
--   In terms of data health, we can see that there are 359 missing records in the *latitude* and *longitude* columns. Since these missing records make up <5% of the 81,735 total road accidents recorded, we can remove these from our data set.
--   We can use *latitude* and *longitude* columns to transform the coordinates into CRS. The EPSG code for latitude-longitude projection is [4326](https://epsg.io/4326). 
+-   In terms of data health, we can see that there are 359 missing records in the *latitude* and *longitude* columns. Since these missing records make up \<5% of the 81,735 total road accidents recorded, we can remove these from our data set.
+-   We can use *latitude* and *longitude* columns to convert the data into a sf object and transform the coordinates into CRS. The EPSG code for latitude-longitude projection is [4326](https://epsg.io/4326).
 -   Thailand adopts EPSG [32647](https://epsg.io/32647), which is in metres.
 
+-   Since the Bangkok Metropolitan Region is made up of [6 provinces](https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region) -- Bangkok, Nonthaburi, Nakhon Pathom, Pathum Thani, Samut Prakan, and Samut Sakhon, we can use the *province_en* column to filter for these provinces.
+
+-   Using the *incident_datetime* column, we can also derive additional columns such as seasons, month, day of the week, time of the day (e.g. morning or evening peak periods). The morning rush hour is said to last from 6am to 9am and evening rush hour is reported to be from 4pm to 7pm [(The Nation)](https://www.nationthailand.com/in-focus/30352400).
+
+-   I also think it would be interesting to derive a column that indicates accidents that happened during the Songkran festival holiday. Notoriously dubbed as the [Seven Deadly Days of Songkran](https://www.nst.com.my/world/world/2023/04/901026/more-250-killed-road-accidents-during-songkran-holiday), road accidents in Bangkok is said to surge due increased traffic from people traveling to celebrate with family.
+
 :::
+
+```{r}
+accidents_bmr <- accidents %>% 
+  
+  # Removes rows with missing longitude and latitude values
+  filter(!is.na(longitude) & longitude != "",
+         !is.na(latitude) & latitude !="") %>% 
+  
+  # Converts data to an sf object using longitude and latitude 
+  st_as_sf(coords = c("longitude", "latitude"),
+           crs = 4326) %>%
+  
+  # Transforms to the projection used in Thailand
+  st_transform(crs = 32647) %>% 
+  
+  # Filter for BMR data
+  filter(province_en %in% c("Bangkok", "Nonthaburi", "Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon")) %>% 
+  
+  # Derive month, days, and hour columns as well as a Songkran indicator
+  mutate(
+    month = month(incident_datetime,
+                  label = TRUE),
+    day = wday(incident_datetime, 
+                    label = TRUE),
+    hour = hour(incident_datetime),
+    songkran = ifelse(
+      as_date(incident_datetime) >= as_date(paste0(year(incident_datetime), "-04-09")) &
+        as_date(incident_datetime) <= as_date(paste0(year(incident_datetime), "-04-16")) &
+        year(incident_datetime) %in% c(2019, 2020, 2021, 2022),
+      1,
+      0)) %>% 
+  mutate(
+    season = ifelse(
+      month %in% c("Feb", "Mar", "Apr", "May"),
+      "Summer",
+      ifelse(
+        month %in% c("Jun", "Jul", "Aug", "Sep", "Oct"),
+        "Rainy",
+        "Winter"
+        )
+      ),
+    peakperiod = ifelse(
+      hour > 6 & hour < 9,
+      "morningpeak",
+      ifelse(
+        hour > 16 & hour < 19,
+        "eveningpeak",
+        "non-peak"
+      )
+    )
+    )
+
+  
+```
+
+
+```{r}
+duplicate <- accidents_bmr %>% 
+  group_by_all() %>% 
+  filter(n()>1) %>% 
+  ungroup()
+  
+duplicate
+```
 
 
 ## Administrative Boundary
@@ -138,17 +260,14 @@ adminboundary <- st_read(dsn = "data/geospatial",
 st_crs(adminboundary)
 ```
 
-
-
 ## Road Lines
 
 ```{r}
 roads <- st_read(dsn = "data/geospatial", 
                 layer = "hotosm_tha_roads_lines_shp")
 ```
+
 ```{r}
 st_crs(roads)
 ```
-
-
 :::
