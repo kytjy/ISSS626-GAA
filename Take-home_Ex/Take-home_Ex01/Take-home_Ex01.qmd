@@ -71,8 +71,6 @@ pacman::p_load(sf, sfdep,
 
 ## 2.2 The Data
 
-### 2.2.1 Data Sources
-
 +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
 | File                                                                                                                                                                                            | Source                     | Screenshot                       |
 +=================================================================================================================================================================================================+============================+==================================+
@@ -91,10 +89,7 @@ pacman::p_load(sf, sfdep,
 
 : {tbl-colwidths="\[25,10,65\]"}
 
-### 2.2.2 Importing Datasets
-
-::: panel-tabset
-## Traffic Accident Data
+### 2.2.1 Traffic Accident Data
 
 `read_csv()` of the **readr** package allows us to import csv files into R Studio.
 
@@ -106,7 +101,7 @@ accidents <- read_csv("data/geospatial/thai_road_accident_2019_2022.csv")
 glimpse(accidents)
 ```
 
-A quick look into the data using `glimpse()` reveals that there are 18 variables in the data, including:
+A quick look into the data using `glimpse()` of the **dplyr** package reveals that there are 18 variables in the data, including:
 
 +-------------------------------+--------------------------------------------------------------------------------+
 | Column Name                   | Description                                                                    |
@@ -150,12 +145,15 @@ A quick look into the data using `glimpse()` reveals that there are 18 variables
 
 : {tbl-colwidths="\[30,70\]"}
 
-Since the *province_th* and *route* columns are in Thai, I will remove them. The province column is already available in English, and the route information can be geocoded using the *latitude* and *longitude* columns.
+Since the *province_th* and *route* columns are in Thai, I will remove them. The province column is already available in English, and the route information can be projected using the *latitude* and *longitude* columns. Additionally, I will remove the *report_datetime* column and use *incident_datetime* for our analysis.
 
 ```{r}
 accidents <- accidents %>% 
-  select(-c(province_th, route))
+  select(-c(province_th, 
+            route, 
+            report_datetime))
 ```
+
 The **gtsummary** package provides us with descriptive statistics of the dataset and also includes the amount of missingness in each variable.
 
 ```{r}
@@ -184,6 +182,19 @@ accidents %>%
 
 :::
 
+The code chunk performs several functions for preparing and transforming the dataset:
+
+1.    The `filter()` function from the **dplyr** package is used to remove rows with missing or empty *longitude* and *latitude* values, ensuring that the dataset contains only valid spatial data.
+2.    The `filter()` function is also employed to retain data exclusively from the Bangkok Metropolitan Region (BMR) by filtering for specific provinces.
+3.    The **sf** package’s `st_as_sf()` function converts the data frame into a spatial object (simple feature) using the *longitude* and *latitude* columns, setting the coordinate reference system (CRS) to EPSG 4326.
+4.    Using `st_transform()` from the **sf** package, the spatial data is reprojected to EPSG 32647, a local projection commonly used in Thailand.
+5.    The **lubridate** package within **tidyverse** is utilised to extract temporal components (month, day of the week, and hour) from the *incident_datetime* column using the `month()`, `wday()`, and `hour()` functions, respectively.
+6.    The *songkran* indicator is created using `ifelse()`, along with `as_date()` and `year()`, to generate a binary variable (1 for "Yes", 0 for "No") indicating whether the accident occurred during the Songkran festival (April 9 to April 16) in the years 2019, 2020, 2021, or 2022.
+7.    Two additional indicators are derived using `ifelse()`:
+      -   *season* variable: classifies accidents into seasons ("Summer", "Rainy", or "Winter") based on the month.
+      -   *peakperiod* variable: identifies whether the accident occurred during morning peak hours (7-9 AM), evening peak hours (5-7 PM), or non-peak times.
+8.    Finally, `select()` from dplyr is used to remove the *incident_datetime* column, as the necessary time-based variables have been derived from it.
+
 ```{r}
 accidents_bmr <- accidents %>% 
   
@@ -201,7 +212,7 @@ accidents_bmr <- accidents %>%
   # Filter for BMR data
   filter(province_en %in% c("Bangkok", "Nonthaburi", "Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon")) %>% 
   
-  # Derive month, days, and hour columns as well as a Songkran indicator
+  # Derive month, days, hour columns as well as a Songkran indicator
   mutate(
     month = month(incident_datetime,
                   label = TRUE),
@@ -214,6 +225,8 @@ accidents_bmr <- accidents %>%
         year(incident_datetime) %in% c(2019, 2020, 2021, 2022),
       1,
       0)) %>% 
+  
+  # Derive season column and peak period indicator
   mutate(
     season = ifelse(
       month %in% c("Feb", "Mar", "Apr", "May"),
@@ -233,11 +246,18 @@ accidents_bmr <- accidents %>%
         "non-peak"
       )
     )
-    )
-
+    ) %>% 
   
+  # Drop incident datetime column
+  select(-incident_datetime)
+
 ```
 
+Another check of the data types and for duplicated records before we move on. The code chunk below identifies all rows in the *accidents_bmr* dataframe that have an exact duplicate (i.e., another row with the same values in all columns) using `group_by_all()`.
+
+```{r}
+glimpse(accidents_bmr)
+```
 
 ```{r}
 duplicate <- accidents_bmr %>% 
@@ -248,19 +268,35 @@ duplicate <- accidents_bmr %>%
 duplicate
 ```
 
+Results confirm that there are no duplicated records found.
 
-## Administrative Boundary
+### 2.2.2 Administrative Boundary
+
+The *adminboundary* dataset, which we downloaded from HDX, is in ESRI shapefile format. To use this data in an R-environment, we need to import it as an sf object. We can do this using the `st_read()` function of the **sf** package. This function reads the shapefile data and returns an sf object that can be used for further analysis.
+
+In the code chunk below, we use `%>%` operator is used to pipe the output of `st_read()` to the `st_transform()` function. Since the dataset we are using is the Thailand boundary, we need to assign the standard coordinate reference system for Thailand, which is EPSG 32647. `st_transform()` function transforms the coordinate reference system of the sf object to 32647.
 
 ```{r}
 adminboundary <- st_read(dsn = "data/geospatial", 
-                layer = "geoBoundaries-THA-ADM0")
+                layer = "geoBoundaries-THA-ADM0") %>% 
+  st_transform(crs = 32647)
 ```
 
 ```{r}
 st_crs(adminboundary)
 ```
 
-## Road Lines
+After importing the dataset, we will plot it to see how it looks. The `plot()` function is used to plot the geometry of the sf object. The `st_geometry()` function is used to extract the geometry of the *adminboundary* object.
+
+```{r}
+par(bg = '#E4D5C9')
+
+par(mar = c(0,0,0,0))
+plot(st_geometry(adminboundary))
+```
+
+
+### 2.2.3 Road Lines
 
 ```{r}
 roads <- st_read(dsn = "data/geospatial", 
