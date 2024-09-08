@@ -131,9 +131,6 @@ pacman::p_load(sf, tmap,
 
 Two geospatial data will be used. They are:
 
--   MPSZ-2019: This data provides the sub-zone boundary of URA Master Plan 2019.
-
-Both data sets are in ESRI shapefile format.
 
 +---------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+-------------------------+
 | Name                                                                                                                | Details                                                | Screenshot              |
