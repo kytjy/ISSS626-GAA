@@ -1,0 +1,525 @@
+---
+title: "Hands-on Exercise 9a: Processing and Visualising Flow Data"
+date: "08 September 2024"
+date-modified: "last-modified"
+format: html
+execute:
+  echo: true #all the codes will appear
+  eval: true #all the codes will run
+  warning: false #dont display if there are any warnings
+editor: visual
+---
+
+![](images/placeholder_9a.PNG){fig-align="center"}
+
+# 1 Overview
+
+Spatial interaction represent the flow of people, material, or information between locations in geographical space. It encompasses everything from freight shipments, energy flows, and the global trade in rare antiquities, to flight schedules, rush hour woes, and pedestrian foot traffic.
+
+Each spatial interaction, as an analogy for a set of movements, is composed of a discrete origin/destination pair. Each pair can be represented as a cell in a matrix where rows are related to the locations (centroids) of origin, while columns are related to locations (centroids) of destination. Such a matrix is commonly known as an origin/destination matrix, or a spatial interaction matrix.
+
+::: {.notebox .note data-latex="note"}
+**Conditions for Spatial Flows**
+
+Three interdependent conditions are necessary for a spatial interaction to occur:
+
+![](images/realization_spatial_interaction.png){width="276"}
+
+**Features**
+
+![](images/movement_spatial_interaction.png){width="276"}
+
+-   *Locations*: A movement is occurring between a location of origin and a location of destination ($i$ = origin; $j$ = destination)
+-   *Centroid*: Abstraction of the attributes of a zone at a point
+-   *Flows*: Expressed by a valued vector $T_{ij}$ representing an interaction between locations $i$ and $j$
+-   *Vectors*: A vector $T_{ij}$ links two centroids and has a value assigned to it (50) which can represents movements
+:::
+
+::: {.sherbox .sherlock data-latex="sherlock"}
+**Task**
+
+In this hands-on exercise, we will learn how to build an OD matrix by using *Passenger Volume by Origin Destination Bus Stops* data set downloaded from LTA DataMall. By the end of this hands-on exercise, we will be able:
+
+-   to import and extract OD data for a selected time interval,
+-   to import and save geospatial data (i.e. *bus stops* and *mpsz*) into sf tibble data frame objects,
+-   to populate planning subzone code into bus stops sf tibble data frame,
+-   to construct desire lines geospatial data from the OD data, and
+-   to visualise passenger volume by origin and destination bus stops by using the desire lines data.
+:::
+
+# 2 The Packages
+
+::: panel-tabset
+## Packages
+
+| Package                                                                                                                                   | Usage                                                                                                                 |
+|-------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| [**sf**](https://cran.r-project.org/web/packages/sf/index.html)                                                                           | For importing, integrating, processing and transforming geospatial data                                               |
+| [**tmap**](https://cran.r-project.org/web/packages/tmap/)                                                                                 | Choropleth mapping; thematic maps                                                                                     |
+| [**stplanr**](https://docs.ropensci.org/stplanr/)                                                                                         | For sustainable transport planning; provides functions and tools for analysis and visualisation of transport projects |
+| [**performance**](https://easystats.github.io/performance/)                                                                               | For model performance measurement                                                                                     |
+| [**ggpubr**](https://rpkgs.datanovia.com/ggpubr/)                                                                                         | For visualisation                                                                                                     |
+| [**tidyverse**](https://www.tidyverse.org/)                                                                                               | For importing, integrating, wrangling and visualising data                                                            |
+| [**DT**](https://rstudio.github.io/DT/), [**knitr**](https://yihui.org/knitr/), [**kableExtra**](https://haozhu233.github.io/kableExtra/) | For building tables                                                                                                   |
+
+: {tbl-colwidths="\[20,80\]"}
+
+## Code
+
+```{r}
+pacman::p_load(sf, tmap, 
+               stplanr,
+               performance,
+               ggpubr, 
+               tidyverse,
+               DT, knitr, kableExtra)
+```
+:::
+
+# 3 The Data
+
+## 3.1 Aspatial
+
++------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+| Step | Description                                                                                                                                                                                                                                                                             | Screenshot            |
++======+=========================================================================================================================================================================================================================================================================================+=======================+
+| 1\.  | Under Dynamic Datasets of the LTA DataMall, click on '*Request API Access*'. Fill up the request accordingly.                                                                                                                                                                           | ![](images/step0.PNG) |
++------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+| 2\.  | Follow instructions from [LTA DataMall API User Guide](https://datamall.lta.gov.sg/content/dam/datamall/datasets/LTA_DataMall_API_User_Guide.pdf) to download and install Postman. Launch Postman app once completed.                                                                   | ![](images/step1.PNG) |
++------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+| 2\.  | From [LTA DataMall API User Guide & Documentation](https://datamall.lta.gov.sg/content/dam/datamall/datasets/LTA_DataMall_API_User_Guide.pdf?ref=stuartbreckenridge.net), search for ***Passenger Volume by Origin Destination Bus Stops***. Copy the URL indicated in the table.       | ![](images/step2.PNG) |
++------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+| 3\.  | In the Postman app, paste URL copied in the field beside 'GET'. Under '*Params*' tab, enter the following details:                                                                                                                                                                      | ![](images/step3.PNG) |
+|      |                                                                                                                                                                                                                                                                                         |                       |
+|      | -   Key: Date                                                                                                                                                                                                                                                                           |                       |
+|      |                                                                                                                                                                                                                                                                                         |                       |
+|      | -   Value: 202407, or whichever YYYYMM you are looking for. Do note that the passenger volume for previous month data will be generated by the 15th of every month, and only files up to the last 3 months is available. For our exercise, Jul 2024 will be the latest file we can use. |                       |
++------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+| 4\.  | Under '*Headers*', enter the following details:                                                                                                                                                                                                                                         | ![](images/step4.PNG) |
+|      |                                                                                                                                                                                                                                                                                         |                       |
+|      | -   Key: AccountKey                                                                                                                                                                                                                                                                     |                       |
+|      |                                                                                                                                                                                                                                                                                         |                       |
+|      | -   Value: This is the API Account Key that can be found from the **LTA DataMall Welcome Email** when you applied for API access.                                                                                                                                                       |                       |
+|      |                                                                                                                                                                                                                                                                                         |                       |
+|      | Click 'Send'.                                                                                                                                                                                                                                                                           |                       |
++------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+| 5\.  | A URL will be generated.                                                                                                                                                                                                                                                                | ![](images/step5.PNG) |
+|      |                                                                                                                                                                                                                                                                                         |                       |
+|      | Press *Ctrl + Click* to download the dataset. This will be in a .zip file format.                                                                                                                                                                                                       |                       |
++------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+
+: {tbl-colwidths="\[5,35,60\]"}
+
+## 3.2 Geospatial
+
+Two geospatial data will be used. They are:
+
+-   MPSZ-2019: This data provides the sub-zone boundary of URA Master Plan 2019.
+
+Both data sets are in ESRI shapefile format.
+
++---------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+-------------------------+
+| Name                                                                                                                | Details                                                | Screenshot              |
++=====================================================================================================================+========================================================+=========================+
+| [*BusStop*](https://datamall.lta.gov.sg/content/datamall/en/static-data.html), from LTA DataMall \> Static Datasets | -   Provides locations of bus stops as at Jun 2024     | ![](images/busstop.PNG) |
+|                                                                                                                     |                                                        |                         |
+|                                                                                                                     | -   Format: SHP (ESRI Shapefile)                       |                         |
++---------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+-------------------------+
+| *MPSZ-2019*                                                                                                         | -   Provides sub-zone boundary of URA Master Plan 2019 |                         |
+|                                                                                                                     |                                                        |                         |
+|                                                                                                                     | -   Format: SHP (ESRI Shapefile)                       |                         |
++---------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------+-------------------------+
+
+: {tbl-colwidths="\[20,20,60\]"}
+
+# 4 Preparing Flow Data
+
+## 4.1 Importing OD data
+
+```{r}
+odbus <- read_csv("data/aspatial/origin_destination_bus_202407.csv")
+```
+
+```{r}
+glimpse(odbus)
+```
+
+*odbus* tibble data frame shows that the values in *ORIGIN_PT_CODE* and *DESTINATON_PT_CODE* are in numeric data type. Hence, the code chunk below is used to convert these data values into character data type.
+
+```{r}
+odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
+odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE) 
+```
+
+Recheck to confirm that the 2 variables have indeed been updated:
+
+```{r}
+glimpse(odbus)
+```
+
+## 4.2 Extracting study data
+
+For our study, we will extract commuting flows on weekday and between 6 and 9 o'clock.
+
+```{r}
+odbus6_9 <- odbus %>%
+  filter(DAY_TYPE == "WEEKDAY") %>%
+  filter(TIME_PER_HOUR >= 6 &
+           TIME_PER_HOUR <= 9) %>%
+  group_by(ORIGIN_PT_CODE,
+           DESTINATION_PT_CODE) %>%
+  summarise(TRIPS = sum(TOTAL_TRIPS))
+```
+
+We can use the **datatable** package for interactive tables:
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+datatable(
+  odbus6_9,
+  filter='top')
+```
+
+We will save the output in rds format for future use, and reimport the saved rds file into R environment:
+
+```{r}
+#| eval: false
+
+write_rds(odbus6_9, "data/rds/odbus6_9.rds")
+odbus6_9 <- read_rds("data/rds/odbus6_9.rds")
+```
+
+# 5 Working with Geospatial Data
+
+## 5.1 Importing geospatial data
+
+### 5.1.1 Polygon data
+
+-   `st_read()` function of sf package is used to import the shapefile into R as sf data frame.
+
+-   `st_transform()` function of sf package is used to transform the projection to crs 3414.
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial",
+                   layer = "MPSZ-2019") %>%
+  st_transform(crs = 3414)
+
+mpsz
+```
+
+```{r}
+summary(mpsz)
+
+unique(mpsz$PLN_AREA_N)
+unique(mpsz$REGION_N)
+```
+
+```{r}
+par(bg = '#E4D5C9')
+
+par(mar = c(0,0,0,0))
+plot(st_geometry(mpsz))
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+There are 332 subzones across 5 regions.
+
+In the plot, we can also see that the MPSZ data includes outer islands of Singapore such as Sudong, Semakau, Southern Group, and North-Eastern islands. Since it's unlikely to catch a bus to/from these islands, I'll remove them from our data.
+:::
+
+```{r}
+outerislands <- c("SEMAKAU", "SUDONG", "NORTH-EASTERN ISLANDS", "SOUTHERN GROUP")
+
+# remove rows where 'SUBZONE_N' is in the list
+mpsz <- mpsz %>%
+  filter(!str_trim(SUBZONE_N) %in% str_trim(outerislands))
+```
+
+We'll plot the mpsz again to ensure the outer islands have been removed.
+
+```{r}
+par(bg = '#E4D5C9')
+
+par(mar = c(0,0,0,0))
+plot(st_geometry(mpsz))
+```
+
+```{r}
+#| eval: true
+
+mpsz <- write_rds(mpsz, "data/rds/mpsz.rds")
+```
+
+### 5.1.2 Point Data
+
+```{r}
+busstop <- st_read(dsn = "data/geospatial",
+                   layer = "BusStop") %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+duplicate <- busstop %>%
+  group_by(BUS_STOP_N) %>%
+  filter(n() > 1) %>%
+  ungroup()
+
+duplicate
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+There are duplicated bus stop numbers, but with different roof IDs and geometry. Some of them could be temporary bus stops within the month.
+
+In the plot below, we can also see that some bus stop fall outside the Singapore administrative boundaries.
+:::
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "#f5f5f5") +
+tm_shape(busstop) +
+  tm_dots(col="#800200") +
+tm_layout(bg.color = "#E4D5C9",
+            frame = F)
+```
+
+## 5.2 Geospatial data wrangling
+
+### 5.2.1 Combine Busstop and mpsz
+
+```{r}
+busstop_mpsz <- st_intersection(busstop, mpsz) %>%
+  select(BUS_STOP_N, SUBZONE_C) %>%
+  st_drop_geometry()
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+Number of bus stop dropped from 5166 (*busstop*) to 5161 (*busstop_mpsz*) due to the 5 busstops outside MPSZ boundary (ie in Malaysia).
+:::
+
+```{r}
+#| echo: true
+
+datatable(busstop_mpsz, 
+          options = list(pageLength = 5))
+```
+
+Save the output in rds format for future use:
+
+```{r}
+#| eval: true
+
+write_rds(busstop_mpsz, "data/rds/busstop_mpsz.rds")  
+```
+
+### 5.2.2 Append planning subzone code from *busstop_mpsz* onto *odbus6_9*
+
+```{r}
+od_data <- left_join(odbus6_9 , busstop_mpsz,
+            by = c("ORIGIN_PT_CODE" = "BUS_STOP_N")) %>%
+  rename(ORIGIN_BS = ORIGIN_PT_CODE,
+         ORIGIN_SZ = SUBZONE_C,
+         DESTIN_BS = DESTINATION_PT_CODE)
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+The number of records before the join is 238,490.
+
+This increased to 239,372 after performing the left join.
+:::
+
+### 5.2.3 Duplicates Check
+
+Check for duplicates to prevent double counting:
+
+```{r}
+duplicate2 <- od_data %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+
+duplicate2
+```
+
+If duplicated records are found, the code chunk below will be used to retain the unique records.
+
+```{r}
+od_data <- unique(od_data)
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+There are 1,470 duplicated records in our data, i.e. 735 pairs.
+
+Before removing duplicates: 239,372 After removal: 238,637
+:::
+
+### 5.2.4 Update *od_data* with planning subzone codes
+
+```{r}
+od_data <- left_join(od_data , busstop_mpsz,
+            by = c("DESTIN_BS" = "BUS_STOP_N")) 
+```
+
+Before: 238,637 After: 239,812
+
+```{r}
+duplicate3 <- od_data %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+
+duplicate3
+```
+
+Retain unique records:
+
+```{r}
+od_data <- unique(od_data)
+```
+
+Before: 239,812 After: 238,890
+
+### 5.2.5 Aggregate Data
+
+```{r}
+od_data <- od_data %>%
+  
+  # Rename column for better clarity
+  rename(DESTIN_SZ = SUBZONE_C) %>%
+  
+  # Remove NAs (where there are missing subzones due to time diff between busstop & ridership info)
+  drop_na() %>% 
+  
+  # Group and summarise number of trips at each O/D level 
+  group_by(ORIGIN_SZ, DESTIN_SZ) %>%
+  summarise(MORNING_PEAK = sum(TRIPS))
+
+od_data
+```
+
+Before: 238,890 After: 20,849
+
+Save the output in rds format for future use, and reimport into R environment:
+
+```{r}
+#| eval: true
+
+write_rds(od_data, "data/rds/od_data.rds")
+od_data <- read_rds("data/rds/od_data.rds")
+```
+
+# 6 Visualising Spatial Interaction
+
+In this section, we learn how to prepare a desired line by using **stplanr** package.
+
+## 6.1 Remove intra-zonal flows
+
+We will not plot the intra-zonal flows, i.e. where the origin and destination are the same (eg origin = AMSZ01 and destination = AMSZ01)
+
+The code chunk below will be used to remove intra-zonal flows.
+
+```{r}
+od_data1 <- od_data[od_data$ORIGIN_SZ!=od_data$DESTIN_SZ,]
+```
+
+Before: 20,849 After: 20,558
+
+::: {.notebox .note data-latex="note"}
+The comma **,** after the condition is significant. In R's data frame syntax, the format for subsetting is \[rows, columns\]. When you place a condition before the comma, it applies to rows. The comma itself then implies that you're not applying any specific filter to the columns -- meaning you want all columns.
+:::
+
+## 6.2 Create desired lines
+
+```{r}
+flowLine <- od2line(flow = od_data1, 
+                    zones = mpsz,
+                    zone_code = "SUBZONE_C")
+
+flowLine
+```
+
+::: {.notebox .note data-latex="note"}
+**Arguments of od2line**
+
+-   flow: data frame representing origin-destination data. The first two columns of this data frame should correspond to the first column of the data in the zones. Thus in `cents_sf()`, the first column is geo_code. This corresponds to the first two columns of `flow()`.
+
+-   zones: spatial object representing origins (and destinations if no separate destinations object is provided) of travel.
+
+-   destinations: spatial object representing destinations of travel flows.
+
+-   zone_code: name of the variable in zones containing the ids of the zone. By default this is the first column names in the zones.
+
+-   origin_code: Name of the variable in flow containing the ids of the zone of origin. By default this is the **first** column name in the flow input dataset.
+
+-   dest_code: name of the variable in flow containing the ids of the zone of destination. By default this is the **second** column name in the flow input dataset or the first column name in the destinations if that is set.
+
+-   zone_code_d: Name of the variable in destinations containing the ids of the zone. By default this is the first column names in the destinations.
+
+-   silent: TRUE by default, setting it to TRUE will show you the matching columns
+:::
+
+## 6.3 Visualise desired lines
+
+::: {.notebox .note data-latex="note"}
+**Arguments of tm_lines**
+
+[tm_lines](https://www.rdocumentation.org/packages/tmap/versions/3.3-4/topics/tm_lines)
+
+-   col: color of the lines. Either a color value or a data variable name.
+-   lwd: line width. Either a numeric value or a data variable.
+-   alpha: transparency number between 0 (totally transparent) and 1 (not transparent).
+-   scale: line width multiplier number.
+-   n: preferred number of color scale classes. Only applicable when lwd is the name of a numeric variable.
+:::
+
+```{r}
+#| echo: false
+#| eval: false
+
+tm_shape(mpsz) +
+  tm_polygons() +
+flowLine %>%  
+tm_shape() +
+  tm_lines(lwd = "MORNING_PEAK",
+           style = "quantile",
+           scale = c(0.1, 1, 3, 5, 7, 10),
+           n = 6,
+           alpha = 0.3) +
+  tm_layout(outer.bg.color = "#E4D5C9")
+  tm_layout(bg.color = "#E4D5C9",
+            frame = F)
+
+```
+
+When the flow data are very messy and highly skewed like the one shown above, it is wiser to focus on selected flows, eg: flow \>= 5000.
+
+```{r}
+tmap_mode('view')
+tmap_options(check.and.fix = TRUE)
+
+tm_shape(mpsz) +
+  tm_polygons() +
+flowLine %>%  
+  filter(MORNING_PEAK >= 5000) %>%
+tm_shape() +
+  tm_lines(lwd = "MORNING_PEAK",
+           style = "quantile",
+           scale = c(0.1, 1, 3, 5, 7, 10),
+           n = 6,
+           alpha = 0.5)
+
+```
+
+# 7 Reference
+
+Kam, T. S. Processing and Visualising Flow Datas. *R for Geospatial Data Science and Analytics.* <https://r4gdsa.netlify.app/chap15.html>
