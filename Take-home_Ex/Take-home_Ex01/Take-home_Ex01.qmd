@@ -62,7 +62,7 @@ In this exercise, we will be using the following packages:
 The following code chunk uses `p_load()` of **pacman** package to check if the aforementioned packages are installed in the computer. If they are, the libraries will be called into R.
 
 ```{r}
-pacman::p_load(sf, sfdep,
+pacman::p_load(sf, sfdep, sfExtras,
                tmap, leaflet,
                tidyverse,
                DT, knitr, kableExtra, gtsummary,
@@ -178,23 +178,16 @@ accidents %>%
 
 -   Since the Bangkok Metropolitan Region is made up of [6 provinces](https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region) -- Bangkok, Nonthaburi, Nakhon Pathom, Pathum Thani, Samut Prakan, and Samut Sakhon, we can use the *province_en* column to filter for these provinces.
 
--   Using the *incident_datetime* column, we can also derive additional columns such as seasons, month, day of the week, time of the day (e.g. morning or evening peak periods). The morning rush hour is said to last from 6am to 9am and evening rush hour is reported to be from 4pm to 7pm [(The Nation)](https://www.nationthailand.com/in-focus/30352400).
-
--   I also think it would be interesting to derive a column that indicates accidents that happened during the Songkran festival holiday. Notoriously dubbed as the [Seven Deadly Days of Songkran](https://www.nst.com.my/world/world/2023/04/901026/more-250-killed-road-accidents-during-songkran-holiday), road accidents in Bangkok is said to surge due increased traffic from people traveling to celebrate with family.
 :::
 
 The code chunk performs several functions for preparing and transforming the dataset:
 
-1.  The `filter()` function from the **dplyr** package is used to remove rows with missing or empty *longitude* and *latitude* values, ensuring that the dataset contains only valid spatial data.
-2.  The `filter()` function is also employed to retain data exclusively from the Bangkok Metropolitan Region (BMR) by filtering for specific provinces.
-3.  The **sf** package's `st_as_sf()` function converts the data frame into a spatial object (simple feature) using the *longitude* and *latitude* columns, setting the coordinate reference system (CRS) to EPSG 4326.
-4.  Using `st_transform()` from the **sf** package, the spatial data is reprojected to EPSG 32647, a local projection commonly used in Thailand.
-5.  The **lubridate** package within **tidyverse** is utilised to extract temporal components (month, day of the week, and hour) from the *incident_datetime* column using the `month()`, `wday()`, and `hour()` functions, respectively.
-6.  The *songkran* indicator is created using `ifelse()`, along with `as_date()` and `year()`, to generate a binary variable (1 for "Yes", 0 for "No") indicating whether the accident occurred during the Songkran festival (April 9 to April 16) in the years 2019, 2020, 2021, or 2022.
-7.  Two additional indicators are derived using `ifelse()`:
-    -   *season* variable: classifies accidents into seasons ("Summer", "Rainy", or "Winter") based on the month.
-    -   *peakperiod* variable: identifies whether the accident occurred during morning peak hours (7-9 AM), evening peak hours (5-7 PM), or non-peak times.
-8.  Finally, `select()` from dplyr is used to remove the *incident_datetime* column, as the necessary time-based variables have been derived from it.
+1.    The `filter()` function from the **dplyr** package is used to remove rows with missing or empty *longitude* and *latitude* values, ensuring that the dataset contains only valid spatial data.
+2.    The **sf** package's `st_as_sf()` function converts the data frame into a spatial object (simple feature) using the *longitude* and *latitude* columns, setting the coordinate reference system (CRS) to EPSG 4326.
+3.    The spatial data is reprojected to EPSG 32647 (a local UTM projection used in Thailand) using `st_transform()` from the **sf** package.
+4.    The `filter()` function is also applied to retain data exclusively from the Bangkok Metropolitan Region (BMR) by filtering for specific provinces.
+
+
 
 ```{r}
 accidents_bmr <- accidents %>% 
@@ -213,45 +206,6 @@ accidents_bmr <- accidents %>%
   # Filter for BMR data
   filter(province_en %in% c("Bangkok", "Nonthaburi", "Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon")) 
   
-  # # Derive month, days, hour columns as well as a Songkran indicator
-  # mutate(
-  #   month = month(incident_datetime,
-  #                 label = TRUE),
-  #   day = wday(incident_datetime, 
-  #                   label = TRUE),
-  #   hour = hour(incident_datetime),
-  #   songkran = ifelse(
-  #     as_date(incident_datetime) >= as_date(paste0(year(incident_datetime), "-04-09")) &
-  #       as_date(incident_datetime) <= as_date(paste0(year(incident_datetime), "-04-16")) &
-  #       year(incident_datetime) %in% c(2019, 2020, 2021, 2022),
-  #     1,
-  #     0)) %>% 
-  # 
-  # # Derive season column and peak period indicator
-  # mutate(
-  #   season = ifelse(
-  #     month %in% c("Feb", "Mar", "Apr", "May"),
-  #     "Summer",
-  #     ifelse(
-  #       month %in% c("Jun", "Jul", "Aug", "Sep", "Oct"),
-  #       "Rainy",
-  #       "Winter"
-  #       )
-  #     ),
-  #   peakperiod = ifelse(
-  #     hour > 6 & hour < 9,
-  #     "morningpeak",
-  #     ifelse(
-  #       hour > 16 & hour < 19,
-  #       "eveningpeak",
-  #       "non-peak"
-  #     )
-  #   )
-  #   ) %>% 
-  # 
-  # # Drop incident datetime column
-  # select(-incident_datetime)
-
 ```
 
 Another check of the data types and for duplicated records before we move on. The code chunk below identifies all rows in the *accidents_bmr* dataframe that have an exact duplicate (i.e., another row with the same values in all columns) using `group_by_all()`.
@@ -412,6 +366,7 @@ highwaytypes <- c("primary",
                   "service") 
 
 roads_sf_filtered <- roads_sf %>%
+  select("highway") %>% 
   filter(highway %in% highwaytypes)
 
 unique(roads_sf_filtered$highway)
@@ -435,7 +390,7 @@ write_rds(roads_bmr, "data/rds/roads_bmr.rds")
 roads_bmr <- read_rds("data/rds/roads_bmr.rds")
 ```
 
-Now that we have scoped out the dataset, we will now plot to see the BMR road network using tmap.
+Now that we have scoped out the dataset, we will now plot to see the BMR road network using **tmap**.
 
 ```{r}
 tmap_mode('plot')
@@ -444,8 +399,78 @@ tm_shape(adminboundary_bmr) +
   tm_fill(alpha=0.6)+
   tm_polygons() +
 tm_shape(roads_bmr) +
-  tm_lines(col = "highway") 
+  tm_lines(col = "highway") +
+  tm_layout(outer.bg.color = "#E4D5C9",
+            bg.color = "#E4D5C9",
+            frame = F,
+            main.title = "Road Network in Bangkok Metropolitan Region",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.outside = TRUE)
+
 ```
 
 # 3 Data Wrangling
+
+## 3.1 Deriving new variables from Accidents data
+
+Using the *incident_datetime* column, we can also derive additional columns such as seasons, month, day of the week, time of the day (e.g. morning or evening peak periods). The morning rush hour is said to last from 6am to 9am and evening rush hour is reported to be from 4pm to 7pm [(The Nation)](https://www.nationthailand.com/in-focus/30352400).
+
+I also think it would be interesting to derive a column that indicates accidents that happened during the Songkran festival holiday. Notoriously dubbed as the [Seven Deadly Days of Songkran](https://www.nst.com.my/world/world/2023/04/901026/more-250-killed-road-accidents-during-songkran-holiday), road accidents in Bangkok is said to surge due increased traffic from people traveling to celebrate with family.
+
+```{r}
+accidents_bmr <- accidents_bmr %>% 
+  # Derive month, days, hour columns as well as a Songkran indicator
+  mutate(
+    month = month(incident_datetime,
+                  label = TRUE),
+    day = wday(incident_datetime,
+                    label = TRUE),
+    hour = hour(incident_datetime),
+    songkran = ifelse(
+      as_date(incident_datetime) >= as_date(paste0(year(incident_datetime), "-04-09")) &
+        as_date(incident_datetime) <= as_date(paste0(year(incident_datetime), "-04-16")) &
+        year(incident_datetime) %in% c(2019, 2020, 2021, 2022),
+      1,
+      0)) %>%
+
+  # Derive season column and peak period indicator
+  mutate(
+    weektype = ifelse(
+      day %in% c("Sat", "Sun"),
+      "weekend",
+      "weekday"
+    ),
+    season = ifelse(
+      month %in% c("Feb", "Mar", "Apr", "May"),
+      "Summer",
+      ifelse(
+        month %in% c("Jun", "Jul", "Aug", "Sep", "Oct"),
+        "Rainy",
+        "Winter"
+        )
+      ),
+    peakperiod = ifelse(
+      hour > 6 & hour < 9,
+      "morningpeak",
+      ifelse(
+        hour > 16 & hour < 19,
+        "eveningpeak",
+        "non-peak"
+      )
+    )
+    ) %>%
+
+  # Drop columns not required anymore
+  select(-c("incident_datetime", "month" ,"day", "hour"))
+```
+
+The code chunk above performs the following function:
+
+1.    The **lubridate** package within **tidyverse** is utilised to extract temporal components (month, day of the week, and hour) from the *incident_datetime* column using the `month()`, `wday()`, and `hour()` functions, respectively.
+2.  The *songkran* indicator is created using `ifelse()`, along with `as_date()` and `year()`, to generate a binary variable (1 for "Yes", 0 for "No") indicating whether the accident occurred during the Songkran festival (April 9 to April 16) in the years 2019, 2020, 2021, or 2022.
+3.  Two additional indicators are derived using `ifelse()`:
+    -   *season* variable: classifies accidents into seasons ("Summer", "Rainy", or "Winter") based on the month.
+    -   *peakperiod* variable: identifies whether the accident occurred during morning peak hours (7-9 AM), evening peak hours (5-7 PM), or non-peak times.
+4.  Finally, `select()` from dplyr is used to remove the *incident_datetime* column, as the necessary time-based variables have been derived from it.
 
