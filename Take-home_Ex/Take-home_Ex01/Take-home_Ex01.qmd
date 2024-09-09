@@ -71,21 +71,21 @@ pacman::p_load(sf, sfdep,
 
 ## 2.2 The Data
 
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
-| File                                                                                                                                                                                            | Source                     | Screenshot                       |
-+=================================================================================================================================================================================================+============================+==================================+
-| [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-thailand), *in SHP file format*                                          | Humanitarian Data Exchange | ![](images/adminboundaries.PNG)  |
-|                                                                                                                                                                                                 |                            |                                  |
-|                                                                                                                                                                                                 |                            | ![](images/adminboundaries2.PNG) |
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
-| [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads), *in SHP file format*                                                                                | Humanitarian Data Exchange | ![](images/roads.PNG)            |
-|                                                                                                                                                                                                 |                            |                                  |
-|                                                                                                                                                                                                 |                            | ![](images/roads2.PNG)           |
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
-| [Thailand Road Accident \[2019-2022\]](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022), *in CSV format*                                                          | Kaggle                     | ![](images/roadacc.PNG)          |
-|                                                                                                                                                                                                 |                            |                                  |
-| This dataset provides a comprehensive statistics on recorded road accidents in Thailand from 2019 to 2022, including time location, accident type, weather condition, and road characteristics. |                            |                                  |
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+----------------------------------+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+---------------------------------+
+| File                                                                                                                                                                                                                                                                                 | Source                     | Screenshot                      |
++======================================================================================================================================================================================================================================================================================+============================+=================================+
+| [Thailand - Subnational](https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-thailand)[Administrative](https://data.humdata.org/dataset/cod-ab-tha?)[Boundaries](https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-thailand), *in SHP file format* | Humanitarian Data Exchange | ![](images/adminboundaries.PNG) |
+|                                                                                                                                                                                                                                                                                      |                            |                                 |
+| There are 3 administrative levels in the shapefile: 0 (country), 1 (province), 2 (district), and 3 (sub-district, tambon) boundaries. We will use level 1 to filter for the Bangkok Metropolitan Region.                                                                             |                            |                                 |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+---------------------------------+
+| [Thailand Roads (OpenStreetMap Export)](https://data.humdata.org/dataset/hotosm_tha_roads), *in SHP file format*                                                                                                                                                                     | Humanitarian Data Exchange | ![](images/roads.PNG)           |
+|                                                                                                                                                                                                                                                                                      |                            |                                 |
+|                                                                                                                                                                                                                                                                                      |                            | ![](images/roads2.PNG)          |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+---------------------------------+
+| [Thailand Road Accident \[2019-2022\]](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022), *in CSV format*                                                                                                                                               | Kaggle                     | ![](images/roadacc.PNG)         |
+|                                                                                                                                                                                                                                                                                      |                            |                                 |
+| This dataset provides a comprehensive statistics on recorded road accidents in Thailand from 2019 to 2022, including time location, accident type, weather condition, and road characteristics.                                                                                      |                            |                                 |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+---------------------------------+
 
 : {tbl-colwidths="\[25,10,65\]"}
 
@@ -171,7 +171,9 @@ accidents %>%
 **Observations**
 
 -   In terms of data health, we can see that there are 359 missing records in the *latitude* and *longitude* columns. Since these missing records make up \<5% of the 81,735 total road accidents recorded, we can remove these from our data set.
+
 -   We can use *latitude* and *longitude* columns to convert the data into a sf object and transform the coordinates into CRS. The EPSG code for latitude-longitude projection is [4326](https://epsg.io/4326).
+
 -   Thailand adopts EPSG [32647](https://epsg.io/32647), which is in metres.
 
 -   Since the Bangkok Metropolitan Region is made up of [6 provinces](https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region) -- Bangkok, Nonthaburi, Nakhon Pathom, Pathum Thani, Samut Prakan, and Samut Sakhon, we can use the *province_en* column to filter for these provinces.
@@ -179,21 +181,20 @@ accidents %>%
 -   Using the *incident_datetime* column, we can also derive additional columns such as seasons, month, day of the week, time of the day (e.g. morning or evening peak periods). The morning rush hour is said to last from 6am to 9am and evening rush hour is reported to be from 4pm to 7pm [(The Nation)](https://www.nationthailand.com/in-focus/30352400).
 
 -   I also think it would be interesting to derive a column that indicates accidents that happened during the Songkran festival holiday. Notoriously dubbed as the [Seven Deadly Days of Songkran](https://www.nst.com.my/world/world/2023/04/901026/more-250-killed-road-accidents-during-songkran-holiday), road accidents in Bangkok is said to surge due increased traffic from people traveling to celebrate with family.
-
 :::
 
 The code chunk performs several functions for preparing and transforming the dataset:
 
-1.    The `filter()` function from the **dplyr** package is used to remove rows with missing or empty *longitude* and *latitude* values, ensuring that the dataset contains only valid spatial data.
-2.    The `filter()` function is also employed to retain data exclusively from the Bangkok Metropolitan Region (BMR) by filtering for specific provinces.
-3.    The **sf** package’s `st_as_sf()` function converts the data frame into a spatial object (simple feature) using the *longitude* and *latitude* columns, setting the coordinate reference system (CRS) to EPSG 4326.
-4.    Using `st_transform()` from the **sf** package, the spatial data is reprojected to EPSG 32647, a local projection commonly used in Thailand.
-5.    The **lubridate** package within **tidyverse** is utilised to extract temporal components (month, day of the week, and hour) from the *incident_datetime* column using the `month()`, `wday()`, and `hour()` functions, respectively.
-6.    The *songkran* indicator is created using `ifelse()`, along with `as_date()` and `year()`, to generate a binary variable (1 for "Yes", 0 for "No") indicating whether the accident occurred during the Songkran festival (April 9 to April 16) in the years 2019, 2020, 2021, or 2022.
-7.    Two additional indicators are derived using `ifelse()`:
-      -   *season* variable: classifies accidents into seasons ("Summer", "Rainy", or "Winter") based on the month.
-      -   *peakperiod* variable: identifies whether the accident occurred during morning peak hours (7-9 AM), evening peak hours (5-7 PM), or non-peak times.
-8.    Finally, `select()` from dplyr is used to remove the *incident_datetime* column, as the necessary time-based variables have been derived from it.
+1.  The `filter()` function from the **dplyr** package is used to remove rows with missing or empty *longitude* and *latitude* values, ensuring that the dataset contains only valid spatial data.
+2.  The `filter()` function is also employed to retain data exclusively from the Bangkok Metropolitan Region (BMR) by filtering for specific provinces.
+3.  The **sf** package's `st_as_sf()` function converts the data frame into a spatial object (simple feature) using the *longitude* and *latitude* columns, setting the coordinate reference system (CRS) to EPSG 4326.
+4.  Using `st_transform()` from the **sf** package, the spatial data is reprojected to EPSG 32647, a local projection commonly used in Thailand.
+5.  The **lubridate** package within **tidyverse** is utilised to extract temporal components (month, day of the week, and hour) from the *incident_datetime* column using the `month()`, `wday()`, and `hour()` functions, respectively.
+6.  The *songkran* indicator is created using `ifelse()`, along with `as_date()` and `year()`, to generate a binary variable (1 for "Yes", 0 for "No") indicating whether the accident occurred during the Songkran festival (April 9 to April 16) in the years 2019, 2020, 2021, or 2022.
+7.  Two additional indicators are derived using `ifelse()`:
+    -   *season* variable: classifies accidents into seasons ("Summer", "Rainy", or "Winter") based on the month.
+    -   *peakperiod* variable: identifies whether the accident occurred during morning peak hours (7-9 AM), evening peak hours (5-7 PM), or non-peak times.
+8.  Finally, `select()` from dplyr is used to remove the *incident_datetime* column, as the necessary time-based variables have been derived from it.
 
 ```{r}
 accidents_bmr <- accidents %>% 
@@ -210,46 +211,46 @@ accidents_bmr <- accidents %>%
   st_transform(crs = 32647) %>% 
   
   # Filter for BMR data
-  filter(province_en %in% c("Bangkok", "Nonthaburi", "Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon")) %>% 
+  filter(province_en %in% c("Bangkok", "Nonthaburi", "Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon")) 
   
-  # Derive month, days, hour columns as well as a Songkran indicator
-  mutate(
-    month = month(incident_datetime,
-                  label = TRUE),
-    day = wday(incident_datetime, 
-                    label = TRUE),
-    hour = hour(incident_datetime),
-    songkran = ifelse(
-      as_date(incident_datetime) >= as_date(paste0(year(incident_datetime), "-04-09")) &
-        as_date(incident_datetime) <= as_date(paste0(year(incident_datetime), "-04-16")) &
-        year(incident_datetime) %in% c(2019, 2020, 2021, 2022),
-      1,
-      0)) %>% 
-  
-  # Derive season column and peak period indicator
-  mutate(
-    season = ifelse(
-      month %in% c("Feb", "Mar", "Apr", "May"),
-      "Summer",
-      ifelse(
-        month %in% c("Jun", "Jul", "Aug", "Sep", "Oct"),
-        "Rainy",
-        "Winter"
-        )
-      ),
-    peakperiod = ifelse(
-      hour > 6 & hour < 9,
-      "morningpeak",
-      ifelse(
-        hour > 16 & hour < 19,
-        "eveningpeak",
-        "non-peak"
-      )
-    )
-    ) %>% 
-  
-  # Drop incident datetime column
-  select(-incident_datetime)
+  # # Derive month, days, hour columns as well as a Songkran indicator
+  # mutate(
+  #   month = month(incident_datetime,
+  #                 label = TRUE),
+  #   day = wday(incident_datetime, 
+  #                   label = TRUE),
+  #   hour = hour(incident_datetime),
+  #   songkran = ifelse(
+  #     as_date(incident_datetime) >= as_date(paste0(year(incident_datetime), "-04-09")) &
+  #       as_date(incident_datetime) <= as_date(paste0(year(incident_datetime), "-04-16")) &
+  #       year(incident_datetime) %in% c(2019, 2020, 2021, 2022),
+  #     1,
+  #     0)) %>% 
+  # 
+  # # Derive season column and peak period indicator
+  # mutate(
+  #   season = ifelse(
+  #     month %in% c("Feb", "Mar", "Apr", "May"),
+  #     "Summer",
+  #     ifelse(
+  #       month %in% c("Jun", "Jul", "Aug", "Sep", "Oct"),
+  #       "Rainy",
+  #       "Winter"
+  #       )
+  #     ),
+  #   peakperiod = ifelse(
+  #     hour > 6 & hour < 9,
+  #     "morningpeak",
+  #     ifelse(
+  #       hour > 16 & hour < 19,
+  #       "eveningpeak",
+  #       "non-peak"
+  #     )
+  #   )
+  #   ) %>% 
+  # 
+  # # Drop incident datetime column
+  # select(-incident_datetime)
 
 ```
 
@@ -270,6 +271,19 @@ duplicate
 
 Results confirm that there are no duplicated records found.
 
+Let's take a quick glance at the points:
+
+```{r}
+#| echo: true
+
+tmap_mode('view')
+
+tm_basemap("OpenStreetMap") +
+tm_shape(accidents_bmr) +
+  tm_dots(alpha=0.4, 
+          size=0.05)
+```
+
 ### 2.2.2 Administrative Boundary
 
 The *adminboundary* dataset, which we downloaded from HDX, is in ESRI shapefile format. To use this data in an R-environment, we need to import it as an sf object. We can do this using the `st_read()` function of the **sf** package. This function reads the shapefile data and returns an sf object that can be used for further analysis.
@@ -278,12 +292,24 @@ In the code chunk below, we use `%>%` operator is used to pipe the output of `st
 
 ```{r}
 adminboundary <- st_read(dsn = "data/geospatial", 
-                layer = "geoBoundaries-THA-ADM0") %>% 
+                layer = "tha_admbnda_adm1_rtsd_20220121") %>% 
   st_transform(crs = 32647)
 ```
 
 ```{r}
 st_crs(adminboundary)
+```
+
+Preliminary look into the *adminboundary* data shows that *ADM1_EN* can be used to filter for the 6 regions in BMR.
+
+```{r}
+glimpse(adminboundary)
+```
+
+```{r}
+adminboundary_bmr <- adminboundary %>% 
+  select("ADM1_EN") %>% 
+  filter(ADM1_EN %in% c("Bangkok", "Nonthaburi", "Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon"))
 ```
 
 After importing the dataset, we will plot it to see how it looks. The `plot()` function is used to plot the geometry of the sf object. The `st_geometry()` function is used to extract the geometry of the *adminboundary* object.
@@ -292,18 +318,134 @@ After importing the dataset, we will plot it to see how it looks. The `plot()` f
 par(bg = '#E4D5C9')
 
 par(mar = c(0,0,0,0))
-plot(st_geometry(adminboundary))
+plot(st_geometry(adminboundary_bmr))
 ```
 
+Let's plot out the administrative boundaries together with the points of accidents:
+
+```{r}
+tmap_mode('view')
+
+tm_basemap("OpenStreetMap") +
+tm_shape(adminboundary_bmr) +
+  tm_fill(alpha=0.6)+
+  tm_polygons() +
+tm_shape(accidents_bmr) +
+  tm_dots(alpha=0.4, 
+          size=0.05)
+```
+
+```{r}
+#| echo: true
+tmap_mode('plot')
+```
 
 ### 2.2.3 Road Lines
+
+The code chunk below imports *MP_SUBZONE_WEB_PL* shapefile by using `st_read()` of *sf* packages.
 
 ```{r}
 roads <- st_read(dsn = "data/geospatial", 
                 layer = "hotosm_tha_roads_lines_shp")
 ```
 
+Note that *roads* does not have crs information. The `st_set_crs()` function allows us to assign coordinate reference system for the data based on latitude and longitude seen under the *Bounding Box* variable which is decimal degrees. After assigning the CRS, `st_transform()` is used to reproject the data to the local CRS. Finally, we can use `st_crs()` to verify that the correct CRS has been applied.
+
 ```{r}
-st_crs(roads)
+roads_sf <- st_set_crs(roads, 4326) %>% 
+  st_transform(crs = 32647)
 ```
-:::
+
+```{r}
+st_crs(roads_sf)
+```
+
+Results above show that the EPSG is indicated as 32647 now.
+
+```{r}
+glimpse(roads_sf)
+```
+
+Next, we will look at the classification of road networks in the data.
+
+```{r}
+unique(roads_sf$highway)
+```
+
+Upon reviewing the road classifications against the [highway descriptions by OpenStreetMap](https://wiki.openstreetmap.org/wiki/Key:highway), we observe that not all categories are relevant to our analysis, which focuses primarily on driving networks. We will keep the 13 types of road segments below for the scope of our study.
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Name                                                                                                                                                       | Description                                                                                                                                                                                                           |
++============================================================================================================================================================+=======================================================================================================================================================================================================================+
+| [Primary](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dprimary), [Primary_Link](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dprimary_link)       | Major highway linking large towns                                                                                                                                                                                     |
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Secondary](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dsecondary), [Secondary_Link](https://wiki.openstreetmap.org/wiki/Tag:highway=secondary_link) | Highways which are not part of major routes, but nevertheless form a link in the national route network                                                                                                               |
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Tertiary](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dtertiary), [Tertiary_Link](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dtertiary_link)   | Roads connecting smaller settlements, and within large settlements for roads connecting local centres                                                                                                                 |
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Trunk](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk), [Trunk_Link](https://wiki.openstreetmap.org/wiki/Tag:highway=trunk_link)                 | Major highway that don't meet the requirements for motorways, and their link roads (sliproads and ramps).                                                                                                             |
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Motorway](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dmotorway), [Motorway_Link](https://wiki.openstreetmap.org/wiki/Tag:highway=motorway_link)     | Highest-performance roads within a territory, generally referred to as motorways, freeways, or expressways.                                                                                                           |
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Residential](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dresidential)                                                                               | Road generally used for local traffic within the settlement. Primarily used for access to residential properties but may include access to some non-residential properties (e.g. a corner shop or convenience store). |
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Unclassified](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dunclassified)                                                                             | Roads with the lowest priority in the interconnecting road network                                                                                                                                                    |
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Service](https://wiki.openstreetmap.org/wiki/Tag:highway%3Dservice)                                                                                       | Provides access to a building service station, beach, campsite, industrial estate, business park, etc.                                                                                                                |
++------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+In the code chunk below, we will first specify the road classes that we want to retain. Next, we will filter *roads_sf* object to remove all the rows that does not have our desired *highway* attribute value.
+
+```{r}
+highwaytypes <- c("primary",
+                  "primary_link", 
+                  "secondary", 
+                  "secondary_link", 
+                  "tertiary", 
+                  "tertiary_link",
+                  "trunk",
+                  "trunk_link",
+                  "motorway",
+                  "motorway_link",
+                  "residential",
+                  "unclassified",
+                  "service") 
+
+roads_sf_filtered <- roads_sf %>%
+  filter(highway %in% highwaytypes)
+
+unique(roads_sf_filtered$highway)
+```
+
+Since the *roads* dataset includes areas outside BMR and our analysis is focused on the region within the BMR, we will need to remove unnecessary rows. To do so, we will use `st_intersection()`.
+
+```{r}
+#| eval: false
+
+roads_bmr <- st_intersection(roads_sf_filtered,
+                            adminboundary_bmr)
+```
+
+```{r}
+#| eval: false
+write_rds(roads_bmr, "data/rds/roads_bmr.rds")
+```
+
+```{r}
+roads_bmr <- read_rds("data/rds/roads_bmr.rds")
+```
+
+Now that we have scoped out the dataset, we will now plot to see the BMR road network using tmap.
+
+```{r}
+tmap_mode('plot')
+
+tm_shape(adminboundary_bmr) +
+  tm_fill(alpha=0.6)+
+  tm_polygons() +
+tm_shape(roads_bmr) +
+  tm_lines(col = "highway") 
+```
+
+# 3 Data Wrangling
+
