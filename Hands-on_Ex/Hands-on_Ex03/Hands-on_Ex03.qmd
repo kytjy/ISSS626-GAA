@@ -101,7 +101,9 @@ network <- st_read(dsn="data/geospatial",
 
 ```{r}
 childcare <- st_read(dsn="data/geospatial",
-                     layer="Punggol_CC")
+                     layer="Punggol_CC") %>% 
+  st_zm(drop = TRUE,
+        what = "ZM")
 ```
 
 ## 4.2 Checking Contents
@@ -507,7 +509,8 @@ kfun_childcare$plotk +
 
 **Inference:**
 
--   Blue line values between *125m-687.5m* fall below the gray envelope.
+-   Blue line values between *125m-687.5m* fall below the gray envelope (sign of regularity)
+-   Beyond 687.5m, no statistical evidence to detect if there is any cluster or regular patterns.
 
 **Conclusion:**
 

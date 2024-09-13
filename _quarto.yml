@@ -45,9 +45,9 @@ website:
             
       - text: "In-class Exercises"
         menu: 
-          - text: 1/
+          - text: 1 Geospatial Data Science with R
             href: In-class_Ex/In-class_Ex01/In-class_Ex01.html
-          - text: 2/
+          - text: 2 Importing Data for Thailand Road Accident Case Study
             href: In-class_Ex/In-class_Ex02/In-class_Ex02.html  
           - text: 3/
             href: In-class_Ex/In-class_Ex03/In-class_Ex03.html    
