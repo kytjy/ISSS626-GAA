@@ -1,7 +1,7 @@
 ---
 title: "Take-home Exercise 1: Understanding and Analysing Thailand Road Accident Data"
 title-block-banner: true
-date: "05-Sep-23"
+date: "05-Sep-24"
 date-modified: "last-modified"
 toc: true
 toc-depth: 4
@@ -18,6 +18,8 @@ format:
     code-summary: "Show the code"
     code-line-numbers: false
 ---
+
+![](images/placeholder.PNG){fig-align="center"}
 
 # 1 Thailand's Killer Roads
 
@@ -37,27 +39,29 @@ In light of this, it is essential to investigate the factors affecting road traf
 
 In this exercise, we will be using the following packages:
 
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Package                                                                                                                                          | Description                                                                                                                                                                            |
-+==================================================================================================================================================+========================================================================================================================================================================================+
-| [**sf**](https://r-spatial.github.io/sf/)                                                                                                        | For importing, managing, and handling geospatial data                                                                                                                                  |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**spatstat**](https://spatstat.org/)                                                                                                            | For point pattern analysis. In this hands-on exercise, it will be used to perform 1st- and 2nd-order spatial point patterns analysis and derive kernel density estimation (KDE) layer. |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**sfdep**](https://sfdep.josiahparry.com/)                                                                                                      | Used to compute spatial weights                                                                                                                                                        |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**tmap**](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html)                                                          | For thematic mapping                                                                                                                                                                   |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**leaflet**](https://rstudio.github.io/leaflet/)                                                                                                | For interactive maps                                                                                                                                                                   |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**tidyverse**](https://www.tidyverse.org/)                                                                                                      | For non-spatial data wrangling                                                                                                                                                         |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**DT**](https://rstudio.github.io/DT/)**, [knitr](https://yihui.org/knitr/), [kableExtra](https://haozhu233.github.io/kableExtra/)**, gtsummary | For building tables                                                                                                                                                                    |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| [**plotly**](https://github.com/plotly/plotly.py)                                                                                                | To create interactive plots                                                                                                                                                            |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|                                                                                                                                                  |                                                                                                                                                                                        |
-+--------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Package                                                                                                                               | Description                                                                                                                                                                     |
++=======================================================================================================================================+=================================================================================================================================================================================+
+| [**sf**](https://r-spatial.github.io/sf/)                                                                                             | For importing, managing, and handling geospatial data                                                                                                                           |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**spatstat**](https://spatstat.org/)                                                                                                 | For point pattern analysis. In this hands-on exercise, it will be used to perform 1st- and 2nd-order spatial point patterns analysis and derive kernel density estimation layer |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**sfdep**](https://sfdep.josiahparry.com/)                                                                                           | Used to compute spatial weights                                                                                                                                                 |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**tmap**](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html)                                               | For thematic mapping                                                                                                                                                            |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**leaflet**](https://rstudio.github.io/leaflet/)                                                                                     | For interactive maps                                                                                                                                                            |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**raster**](https://rspatial.org/raster/pkg/index.html)                                                                              | For raster data manipulation functions                                                                                                                                          |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**spNetwork**](https://jeremygelb.github.io/spNetwork/)                                                                              | For spatial analysis on networks                                                                                                                                                |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**tidyverse**](https://www.tidyverse.org/)                                                                                           | For non-spatial data wrangling                                                                                                                                                  |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**DT**](https://rstudio.github.io/DT/)**, [knitr](https://yihui.org/knitr/), [kableExtra](https://haozhu233.github.io/kableExtra/)** | For building tables                                                                                                                                                             |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**gtsummary**](https://www.danieldsjoberg.com/gtsummary/)                                                                            | For publication-ready analyticla and summary tables                                                                                                                             |
++---------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : {tbl-colwidths="\[20,80\]"}
 
@@ -70,8 +74,7 @@ pacman::p_load(sf, sfdep,
                raster,
                spNetwork,
                tidyverse,
-               DT, knitr, kableExtra, gtsummary,
-               plotly)
+               DT, knitr, kableExtra, gtsummary)
 ```
 
 ## 2.2 The Data
@@ -363,6 +366,10 @@ Results above show that the EPSG is indicated as 32647 now.
 glimpse(roads_sf)
 ```
 
+```{r}
+roads_sf
+```
+
 Next, we will look at the classification of road networks in the data.
 
 ```{r}
@@ -421,7 +428,7 @@ Since the *roads* dataset includes areas outside BMR and our analysis is focused
 #| eval: false
 
 roads_bmr <- st_intersection(roads_sf_filtered,
-                            adminboundary_bmr)
+                             adminboundary_bmr)
 ```
 
 ```{r}
@@ -431,6 +438,10 @@ write_rds(roads_bmr, "data/rds/roads_bmr.rds")
 
 ```{r}
 roads_bmr <- read_rds("data/rds/roads_bmr.rds")
+```
+
+```{r}
+roads_bmr
 ```
 
 Now that we have scoped out the dataset, we will now plot to see the BMR road network.
@@ -459,9 +470,9 @@ accidents_bmr_extra <- accidents_bmr %>%
   # Derive month, days, hour columns as well as a Songkran indicator
   mutate(
     month = month(incident_datetime,
-                  label = TRUE),
+                  label = FALSE),
     day = wday(incident_datetime,
-                    label = TRUE),
+                    label = FALSE),
     hour = hour(incident_datetime),
     songkran = ifelse(
       as_date(incident_datetime) >= as_date(paste0(year(incident_datetime), "-04-09")) &
@@ -473,15 +484,15 @@ accidents_bmr_extra <- accidents_bmr %>%
   # Derive season column and peak period indicator
   mutate(
     weektype = ifelse(
-      day %in% c("Sat", "Sun"),
+      day %in% c("6", "7"),
       "weekend",
       "weekday"
     ),
     season = ifelse(
-      month %in% c("Feb", "Mar", "Apr", "May"),
+      month %in% c("2", "3", "4", "5"),
       "Summer",
       ifelse(
-        month %in% c("Jun", "Jul", "Aug", "Sep", "Oct"),
+        month %in% c("6", "7", "8", "9", "10"),
         "Rainy",
         "Winter"
         )
@@ -500,8 +511,8 @@ accidents_bmr_extra <- accidents_bmr %>%
   # Drop columns not required anymore
   select(-c("acc_code", 
             "incident_datetime", 
-            "agency",
-            "month", "day", "hour"))
+            "agency"
+            ))
 ```
 
 The code chunk above performs the following function:
@@ -519,7 +530,7 @@ In order to use the capabilities of **spatstat** package, a spatial dataset shou
 
 In previous section, we have created sf objects of accident points. Now, we will convert them into ppp objects using `as.ppp()` function from **spatstat** package.
 
-The code chunk below converts the *accidents_bmr_lean* object to a point pattern object of class ppp. `st_coordinates()` function is used to extract the coordinates of the *accidents_bmr_lean* object and `st_bbox()` function is used to extract the bounding box of the *accidents_bmr_lean* object. The resulting object *accidents_ppp* is a point pattern object of class ppp.
+The code chunk below converts the *accidents_bmr_extra* object to a point pattern object of class ppp. `st_coordinates()` function is used to extract the coordinates of the *accidents_bmr_extra* object and `st_bbox()` function is used to extract the bounding box of the *accidents_bmr_extra* object. The resulting object *accidents_ppp* is a point pattern object of class ppp.
 
 ```{r}
 accidents_ppp <- as.ppp(st_coordinates(accidents_bmr_extra),
@@ -544,11 +555,10 @@ summary(accidents_ppp)
 
 Note that the message above suggests that the pattern contains duplicated points.
 
-When analysing spatial point processes, it is important to avoid duplication of points. This is because statistical methodology for spatial point processes is based largely on the assumption that processes are simple, i.e., that points of the process can never be coincident. When the data have coincident points, some statistical procedures designed for simple point processes will be severely affected.
-
+When analysing spatial point processes, it is important to avoid duplication of points. This is because statistical methodology for spatial point processes is based largely on the assumption that points of the process can never be coincident. When the data have coincident points, some statistical procedures designed for simple point processes will be affected.
 :::
 
-## 3.4 Jittering 
+## 3.4 Jittering
 
 To resolve the issue of duplicated points, we apply jittering with the `rjitter()` function. This adds a small variation to the points, preventing them from occupying the exact same location.
 
@@ -575,10 +585,9 @@ accidents_ppp_jit <- accidents_ppp_jit[["Simulation 99"]]
 plot(accidents_ppp_jit)
 ```
 
-
 ## 3.5 Creating Observation Windows
 
-Many data types in **spatstat** require us to specify the region of space inside which the data were observed. This is the observation window and it is represented by an object of class *owin.* In this analysis, our study area is BMR, hence we will use BMR boundary as the observation window for spatial point pattern analysis.
+Many data types in **spatstat** require us to specify the region of space inside which the data were observed. This is the observation window and it is represented by an object of class *owin*. In this analysis, our study area is BMR, hence we will use BMR boundary as the observation window for spatial point pattern analysis.
 
 To convert our *adminboundary_bmr* sf object to *owin* object, we will use `as.owin()` function from **spatstat** package.
 
@@ -591,11 +600,9 @@ par(bg = '#E4D5C9',
 plot.owin(adminboundary_bmr_owin)
 ```
 
-
 ```{r}
 summary(adminboundary_bmr_owin)
 ```
-
 
 ## 3.6 Combing *ppp* and *owin* objects
 
@@ -613,7 +620,7 @@ plot(acc_bmr_ppp)
 
 # 4 Exploratory Spatial Data Analysis
 
-Descriptive statistics are used in point pattern analysis to summarise a point pattern’s basic properties, such as its central tendency and dispersion. The mean centre and the median centre are two often employed metrics for central tendency.
+Descriptive statistics are used in point pattern analysis to summarise a point pattern's basic properties, such as its central tendency and dispersion. The mean center and the median centre are 2 frequently used metrics for central tendency.
 
 ## 4.1 Measuring Central Tendency
 
@@ -627,11 +634,12 @@ accidents_mc <- apply(accidents_xy, 2, mean)
 
 accidents_mc
 ```
+
 The results show that the mean centre is at (668399.5, 1523495.9).
 
 ### 4.1.2 Median Center
 
-Median center is the location that minimises the sum of distances required to travel to all points within an observation window. The procedure begins at a predetermined point, such as the median center, as the initial point. Then, the algorithm updates the median center’s new coordinates (x’, y’) continually until the optimal value is reached. The median center, as opposed to the mean center, offers a more reliable indicator of central tendency as it is unaffected by outliers.
+Median center is the location that minimises the sum of distances required to travel to all points within an observation window. The procedure begins at a predetermined point, such as the median center, as the initial point. Then, the algorithm updates the median center's new coordinates (x', y') continually until the optimal value is reached. The median center, as opposed to the mean center, offers a more reliable indicator of central tendency as it is unaffected by outliers.
 
 ```{r}
 accidents_medc <- apply(accidents_xy, 2, median)
@@ -640,8 +648,7 @@ accidents_medc
 
 Based on the results, the median centre of accidents is (673446.1, 1520755.0).
 
-The mean centers and median centers are similar. This may imply that the distribution of the data is relatively balanced and there is not a significant difference in the spatial patterns between the accident points. Additionally, this indicates that both the mean center and median center are effective measures for analyzing the central tendency of the data in this context.
-
+The mean centers and median centers are similar. This may imply that the distribution of the data is relatively balanced and there is not a significant difference in the spatial patterns between the accident points. Additionally, this indicates that both the mean center and median center are effective measures for analysing the central tendency of the data in this context.
 
 ```{r}
 par(bg = '#E4D5C9', mar = c(0,0,1,0))
@@ -668,6 +675,7 @@ accidents_sd <- sqrt(sum((accidents_xy[,1] - accidents_mc[1])^2 +
 
 accidents_sd
 ```
+
 ### 4.2.2 Plotting Standard Distance
 
 In this section, we will create bearing circle of accident points using the standard distance value we have calculated earlier. This can provide visual representation of the dispersion.
@@ -689,7 +697,7 @@ lines(circle, col='#f5347f', lwd=2)
 
 ## 4.3 Spatial Randomness Test
 
-Clark and Evans (1954) give a very simple test of spatial randomness called Clark and Evans aggregation index (R). It is the ratio of the observed mean nearest neighbour distance in the pattern to that expected for a Poisson point process of the same intensity. R-value >1 suggests ordering, while R-value <1 suggests clustering.
+Clark and Evans (1954) give a very simple test of spatial randomness called Clark and Evans aggregation index (*R*). It is the ratio of the observed mean nearest neighbour distance in the pattern to that expected for a Poisson point process of the same intensity. R-value \>1 suggests ordering, while R-value \<1 suggests clustering.
 
 We will perform the Clark-Evans test of aggregation for a spatial point pattern by using `clarkevans.test()` of **statspat**.
 
@@ -710,14 +718,15 @@ clarkevans.test(acc_bmr_ppp,
                 nsim=99)
 ```
 
-The Clark-Evans test for the accident points shows an R-value of 0.22579, which is less than 1. This indicates a clustered distribution. The p-value is less than 2.2e-16, which is extremely small and less than the significance level of 0.05. This means that we will reject the null hypothesis ($H_0$) and accept the alternative hypothesis ($H_1$). 
+The Clark-Evans test for the accident points shows an R-value of 0.22579, which is less than 1. This indicates a clustered distribution. The p-value is less than 2.2e-16, which is extremely small and less than the significance level of 0.05. This means that we will reject the null hypothesis ($H_0$) and accept the alternative hypothesis ($H_1$).
 
 Therefore, the statistical inference from this test is that the accident points are not randomly distributed but are clustered. This suggests that there may be underlying factors influencing the spatial distribution of these points.
 
-
 # 5 First-Order Spatial Point Pattern Analysis
 
-After data wrangling is complete, we will start to perform first-order spatial point pattern analysis using functions from **spatstat** package. First-order properties concern the characteristics of individual point locations and their variations of their density across space and are mostly addressed by density-based techniques, such as quadrant analysis and kernel density estimation.
+We can now start to perform first-order spatial point pattern analysis using functions from **spatstat** package.
+
+First-order properties concern the characteristics of individual point locations and their variations of their density across space and are mostly addressed by density-based techniques, such as quadrant analysis and kernel density estimation.
 
 Investigation of the intensity of a point pattern is one of the first and most important steps in point pattern analysis. If the point process has an intensity function λ(u), this function can be estimated non-parametrically by kernel estimation. Kernel estimation allows for smoothing of the probability density estimation of a random variable (in this analysis a point event) based on kernels as weights.
 
@@ -731,9 +740,9 @@ acc_bmr_ppp.km <- rescale(acc_bmr_ppp, 1000, "km")
 
 ## 5.2 Computing Default Kernel Density Estimation
 
-Kernel Destiny Estimation (KDE) generates a surface (raster) representing the estimated distribution of point events over the observation window. Each cell in the KDE layer carries a value representing the estimated density of that location. 
+KDE is particularly effective in identifying areas with high occurrences of traffic accidents. It divides the study area into cells, overlays a symmetrical, curved surface on each accident location, and aggregates these values within a given radius to estimate density. The density is highest at the accident location and decreases with distance, reflecting a distance decay effect.
 
-KDE allows us to identify traffic accident hot spots, which is an essential step for the appropriate allocation of resources for safety improvements. To do that, we use `density.ppp()` from the **spatstat** package.
+To do that, we use `density.ppp()` from the **spatstat** package.
 
 ```{r}
 #| code-fold: true
@@ -747,8 +756,7 @@ plot(kde_default, main = "Default Density KDE")
 contour(kde_default, add=TRUE)
 ```
 
-
-The key argument to pass to the [`density()`](https://www.rdocumentation.org/packages/spatstat.core/versions/2.3-1/topics/density.ppp) function for point pattern objects is *sigma*, which determines the smoothing bandwidth of the kernel. A smaller bandwidth reveals more details, creating peaks and valleys, while a larger bandwidth smooths the distribution but with less precision. If the bandwidth is too small, the result can look overly noisy, and if it's too large, important details may be lost due to over-smoothing.
+The key argument to pass to the [`density()`](https://www.rdocumentation.org/packages/spatstat.core/versions/2.3-1/topics/density.ppp) function for point pattern objects is *sigma*, which determines the smoothing bandwidth of the kernel. A narrow bandwidth can reveal local fluctuations, useful for detailed analyses, while a larger bandwidth smooths out variations, providing a general overview.
 
 By default, when the sigma value isn't provided, a bandwidth is determined by a simple rule of thumb that depends only on the size of the window. This default setting might not always give the desired result. In the KDE plot we generated, there's evidence of over-smoothing, where only one large spatial cluster is visible, potentially hiding smaller clusters or important details.
 
@@ -762,14 +770,13 @@ To address this, we can manually set the bandwidth using the sigma argument or c
 
 -   [`bw.diggle()`](https://search.r-project.org/CRAN/refmans/spatstat.explore/html/bw.diggle.html): In the Cross Validated Bandwidth Selection, the bandwidth is chosen to minimise the mean-square error criterion. The mean-square error is a measure of the average of the squares of the errors - that is, the average squared difference between the estimated values and the actual value.
 
--   [`bw.CvL()`](https://search.r-project.org/CRAN/refmans/spatstat.explore/html/bw.CvL.html): In the Cronie and van Lieshout’s Criterion for Bandwidth Selection, the bandwidth is chosen to minimise the discrepancy between the area of the observation window and the sum of reciprocal estimated intensity values at the points of the point process. This method aims to choose a bandwidth that best represents the underlying point process, taking into account both the observed points and the area they occupy.
+-   [`bw.CvL()`](https://search.r-project.org/CRAN/refmans/spatstat.explore/html/bw.CvL.html): In the Cronie and van Lieshout's Criterion for Bandwidth Selection, the bandwidth is chosen to minimise the discrepancy between the area of the observation window and the sum of reciprocal estimated intensity values at the points of the point process. This method aims to choose a bandwidth that best represents the underlying point process, taking into account both the observed points and the area they occupy.
 
--   [`bw.scott()`](https://search.r-project.org/CRAN/refmans/spatstat.explore/html/bw.scott.html): In the Scott’s Rule for Bandwidth Selection, the bandwidth is computed by the rule of thumb where the bandwidth is proportional to $n^{-1/(d+4)}$, where n is the number of points and d is the number of spatial dimensions. This method is useful for estimating gradual trend.
+-   [`bw.scott()`](https://search.r-project.org/CRAN/refmans/spatstat.explore/html/bw.scott.html): In the Scott's Rule for Bandwidth Selection, the bandwidth is computed by the rule of thumb where the bandwidth is proportional to $n^{-1/(d+4)}$, where n is the number of points and d is the number of spatial dimensions. This method is useful for estimating gradual trend.
 
--   [`bw.ppl()`](https://search.r-project.org/CRAN/refmans/spatstat.explore/html/bw.ppl.html): In the Likelihood Cross Validation Bandwidth Selection, the bandwidth is chosen to maximise the point process likelihood. 
+-   [`bw.ppl()`](https://search.r-project.org/CRAN/refmans/spatstat.explore/html/bw.ppl.html): In the Likelihood Cross Validation Bandwidth Selection, the bandwidth is chosen to maximise the point process likelihood.
 
-:::panel-tabset
-
+::: panel-tabset
 ## bw.diggle()
 
 ```{r}
@@ -797,8 +804,6 @@ bw_scott
 bw_ppl <- bw.ppl(acc_bmr_ppp.km)
 bw_ppl
 ```
-
-
 :::
 
 ::: {.lightbox .light data-latex="light"}
@@ -807,13 +812,13 @@ bw_ppl
 Note that `bw_diggle`, `bw_CvL` and `bw_ppl` functions produce a numeric sigma value, while `bw_scott` provides a separate bandwidth for the x and y coordinates respectively. The `sigma.x` and `sigma.y` values represent the amount of smoothing applied in each direction when estimating the kernel density.
 
 We can specify *isotropic=TRUE* argument when calculating `bw_scott()` method to produce a single value bandwidth, or use the `bw.scott.iso()` function instead.
-
 :::
 
 ```{r}
 bw_scott_iso <- bw.scott.iso(acc_bmr_ppp.km)
 bw_scott_iso 
 ```
+
 ```{r}
 par(bg = '#E4D5C9',
     #mar = c(0,0,1,0),
@@ -834,7 +839,8 @@ plot(bw_ppl,
      xlim=c(-1,5), 
      ylim=c(00,30000))
 ```
-### 5.3.2 Choosing Fixed-Bandwidth KDE 
+
+### 5.3.2 Choosing Fixed-Bandwidth KDE
 
 ```{r}
 kde_diggle <- density(acc_bmr_ppp.km, bw_diggle)
@@ -868,14 +874,13 @@ hist(kde_ppl,main = "kde_ppl")
 ::: {.lightbox .light data-latex="light"}
 **Observations**
 
--   *kde_diggle* and **kde_ppl*: The sharp spike at the beginning indicates a high concentration of points within the first bin, while the remaining bins show little to no density. This pattern suggests that a specific area within our observation window experiences significant spatial clustering, with other areas showing much less activity. 
+-   *kde_diggle* and \*\*kde_ppl\*: The sharp spike at the beginning indicates a high concentration of points within the first bin, while the remaining bins show little to no density. This pattern suggests that a specific area within our observation window experiences significant spatial clustering, with other areas showing much less activity.
 
 -   *kde_CvL*: This method results in a more evenly spread distribution, indicating that spatial point concentrations are more dispersed across the area. However, the smaller bin size in this method may smooth out the data too much, potentially masking smaller, more localised clusters or important spatial patterns.
 
 -   *kde_scott*: Compared to the other methods, *kde_scott* shows a wider range of values and a less pronounced initial spike, suggesting it captures both highly concentrated and moderately concentrated areas more effectively. This method balances the spatial distribution better by not overly smoothing or skewing the data.
 
 Based on these observations, we will proceed with the *scott* method for further analysis. The *scott* method strikes a good balance between bias and variance. If the bandwidth is too small, the estimate can become overly variable and noisy (high variance), as seen in the histograms for *bw_diggle* and *bw_ppl*. Conversely, if the bandwidth is too large, the data becomes oversmoothed, losing important spatial details (high bias), which is evident in the *kde_CvL* histogram. By balancing these two extremes, *bw_scott* provides a more comprehensive and detailed representation of spatial clustering without losing important nuances.
-
 :::
 
 ```{r}
@@ -902,13 +907,13 @@ plot(kde_fixed_scott,
 contour(kde_fixed_scott, add=TRUE)
 ```
 
-From the plot above, it seems that reducing the bandwidth (which shrinks the point cluster buffers) has lessened the over-smoothing effect while still clearly illuminating the accident hotspot areas.
+From the plot above, it seems that reducing the bandwidth (which shrinks the point cluster buffers) has lessened the over-smoothing effect while still clearly highlighting the accident hotspot areas.
 
 ## 5.3.3 Kernel Methods
 
-There are 4 types of kernels in `density.ppp()`, namely: Gaussian, Epanechnikov, Quartic and Dics. A *Gaussian* kernel is set automatically. 
+There are 4 types of kernels in `density.ppp()`, namely: Gaussian, Epanechnikov, Quartic and Dics. *Gaussian* kernel is the default.
 
-The code chunk below will be used to compute three more kernel density estimations by using these three kernel function.
+The code chunk below will be used to compute 3 more kernel density estimations by using these three kernel function.
 
 ```{r}
 kde_fixed_scott.gaussian <- density(acc_bmr_ppp.km, 
@@ -946,8 +951,7 @@ plot(kde_fixed_scott.disc, main="Disc")
 ::: {.lightbox .light data-latex="light"}
 **Observations**
 
-Although there are minor differences in smoothness and spread, all four plots display similar density estimation patterns. This indicates that the choice of kernel function does not significantly affect the KDE results. As a result, we will not emphasise this factor in our analysis.
-
+While there are slight variations in smoothness and spread, all 4 plots exhibit similar density patterns. This suggests that the choice of kernel function has minimal impact on the overall KDE results. Therefore, we will not prioritise this factor in our analysis.
 :::
 
 ## 5.4 KDE Layers with Spatially Adaptive Bandwidth
@@ -958,12 +962,11 @@ In the section below, we compare the fixed with adaptive bandwidth-based KDE, an
 
 `adaptive.density()` of **Spatstat** offers 3 estimation methods:
 
-1.    *method = "voronoi"*: which estimates the intensity using the Voronoi-Dirichlet tessellation
-2.    *method = "kernel"*: which estimates the intensity using a variable-bandwidth kernel estimator
-3.    `*method = "nearest"*: which computes an estimate of the intensity function of a point pattern dataset using the distance from each spatial location to the kth nearest points
+1.  *method = "voronoi"*: which estimates the intensity using the Voronoi-Dirichlet tessellation
+2.  *method = "kernel"*: which estimates the intensity using a variable-bandwidth kernel estimator
+3.  \`*method = "nearest"*: which computes an estimate of the intensity function of a point pattern dataset using the distance from each spatial location to the kth nearest points
 
-:::panel-tabset
-
+::: panel-tabset
 ## Voronoi-Dirichlet Adaptive Density Estimate
 
 ```{r}
@@ -999,7 +1002,6 @@ par(bg = '#E4D5C9',
 plot(kde_adaptive_kernel,
      main = "Adaptive Kernel Density Estimate")
 ```
-
 
 ## Nearest-Neighbour Adaptive Density Estimate
 
@@ -1112,7 +1114,6 @@ The analysis reveals that the highest concentration of accidents is found in Ban
 Different maps suggests different stories. The Adaptive Nearest Neighbour and Adaptive Kernel KDE methods both identify a significant concentration of accidents in the Khlong Chang Tai area along Highway 3701 in Samut Prakan, with a reported high concentration of 600 incidents. This area stands out due to its substantial accident rates, suggesting that it might be a focal point for further investigation and intervention. This was not identified in the Fixed Bandwidth KDE.
 
 Overall, the findings indicate that accident hotspots are predominantly located around major roadways and highways, with specific regions exhibiting particularly high accident densities. This pattern highlights the need for targeted road safety measures and further analysis in these critical areas.
-
 :::
 
 ## 5.6 Province-Level KDE
@@ -1132,6 +1133,7 @@ plot(st_geometry(bkk), main = "Bangkok")
 plot(st_geometry(spk), main = "Samut Prakan")
 
 ```
+
 Next, we will create owin objects to represent the observation windows for respective planning area. Once owin objects are created, we will also filter accident locations in each observation window from the original *acc_bmr_ppp* ppp object.
 
 ```{r}
@@ -1198,15 +1200,13 @@ One issue is that fixed KDE maps tend to over-smooth the data, making it hard to
 Additionally, because KDE calculates values using grid pixels and Euclidean distance, the resulting grid blocks limit our ability to see detailed differences within smaller areas such as the example below. This restricts our ability to identify finer patterns within each region, reducing the effectiveness of the analysis at a more localised level.
 
 ![](images/kde1.PNG){fig-align="center"}
-
 :::
 
 # 6 Network Constrained Kernel Density Estimation (NKDE)
 
-In real-world scenarios, events like accidents tend to follow specific networks, such as road systems, rather than being randomly spread out. Traditional Kernel Density Estimation (KDE) assumes events occur across an open, two-dimensional space, which doesn’t accurately reflect network-based patterns like road traffic. Since movement on these networks is confined to one-dimensional paths, Network Constrained Kernel Density Estimation (NKDE) provides an extension of spatial KDE.
+In real-world scenarios, events like accidents tend to follow specific networks, such as road systems, rather than being randomly spread out. Traditional Kernel Density Estimation (KDE) assumes events occur across an open, two-dimensional space, which doesn't accurately reflect network-based patterns like road traffic. Since movement on these networks is confined to one-dimensional paths, Network Constrained Kernel Density Estimation (NKDE) provides an extension of spatial KDE.
 
 NKDE estimates event density strictly along the network, dividing roads into small units called "lixels" (like one-dimensional pixels) and calculating event density at the center of these segments. Instead of using straight-line (Euclidean) distances between events, NKDE measures the shortest path along the network. This method adjusts the intensity estimate to reflect density along a road rather than across an area, providing a clearer interpretation.
-
 
 In this section, we'll focus on generating NKDE maps for the two provinces identified earlier, using the **spNetwork** package to better understand these road-based event patterns.
 
@@ -1214,48 +1214,1168 @@ In this section, we'll focus on generating NKDE maps for the two provinces ident
 
 First, we will have to extract the road network details and accidents pertaining to our 2 provinces.
 
-```{r}
-bkk_network = st_intersection(roads_bmr,st_union(bkk))
-spk_network = st_intersection(roads_bmr,st_union(spk))
+The code chunk below performs the following functions:
 
-bkk_destination = st_intersection(accidents_bmr_extra,st_union(bkk))
-spk_destination = st_intersection(accidents_bmr_extra,st_union(spk))
+-   `st_intersection()` is used to find the geometries that overlap between *roads_bmr* (the road network data for the entire Bangkok Metropolitan Region) and the boundary of Bangkok or Samut Prakan. `st_union()` combines all individual geometries within the boundary of Bangkok or Samut Prakan into a single geometry to perform the intersection. This ensures that the entire boundary of Bangkok is treated as a single spatial unit during the intersection.
+-   After the intersection, `filter()` ensures that only LINESTRING geometries (i.e., line segments representing roads) are retained. This step removes any points or other geometries that may have resulted from the intersection.
+-   Similar to the road network extraction, the `st_intersection()` function is used to find the accidents (from *accidents_bmr_extra*, which contains accident data for the BMR) that fall within the Bangkok and Samut Prakan boundaries.
+
+```{r}
+# Road Network
+bkk_network <- st_intersection(roads_bmr, st_union(bkk)) %>% 
+  filter(st_geometry_type(.) == "LINESTRING")
+
+spk_network <- st_intersection(roads_bmr, st_union(spk)) %>% 
+  filter(st_geometry_type(.) == "LINESTRING")
+```
+
+```{r}
+#| eval: false
+# Accidents
+bkk_acc <- st_intersection(accidents_bmr_extra, bkk)
+spk_acc <- st_intersection(accidents_bmr_extra, spk)
+
+```
+
+```{r}
+#| eval: false
+write_rds(bkk_acc, "data/rds/bkk_acc.rds")
+write_rds(spk_acc, "data/rds/spk_acc.rds")
+```
+
+```{r}
+bkk_acc <- read_rds("data/rds/bkk_acc.rds")
+spk_acc <- read_rds("data/rds/spk_acc.rds")
+```
+
+```{r}
+#| echo: true
+#| eval: false
+
+bkk_network.snapped <- snapPointsToLines2(bkk_network, roads_bmr)
+spk_network.snapped <- snapPointsToLines2(spk_network, roads_bmr)
+```
+
+```{r}
+#| echo: true
+#| eval: false
+
+rm(bkk_network.snapped)
+rm(spk_network.snapped)
 ```
 
 ## 6.2 Preparing lixel objects
 
+Before calculating the NKDE, the road network must be segmented into smaller units, called lixels, using the `lixelize_lines()` function from the **spNetwork** package. A lixel represents a linear pixel along the road network, which is used as a basis for estimating spatial density.
 
+In the code chunk below, each lixel is set to a length of 500 meters, while the minimum length (*mindist*) is set to 250 meters. This means that if the final lixel in a segment is shorter than 250 meters, it will be merged with the preceding lixel. Lixels that are already shorter than the minimum distance remain unchanged.
+
+Since we have narrowed down to the 2 provinces where road traffic accidents can be highly clustered around certain hotspots, a smaller lixel size (i.e., 500 meters) might offer more detailed insights into local variations in accident density. Larger lixels, like 1000 meters, can potentially smooth out these variations, missing critical hotspots, especially in densely populated urban areas.
+
+```{r}
+bkk_lixels <- lixelize_lines(bkk_network, 
+                         500, 
+                         mindist = 250)
+
+spk_lixels <- lixelize_lines(spk_network, 
+                         500, 
+                         mindist = 250)
+```
 
 ## 6.3 Generating line centre points
 
-## 6.4 Performing NKDE
+Next, `lines_center()` of **spNetwork** will be used to generate a SpatialPointsDataFrame with line centre points. The points are located at center of the line based on the length of the line.
+
+```{r}
+#| eval: false
+
+bkk_samples <- lines_center(bkk_lixels)
+spk_samples <- lines_center(spk_lixels)
+```
+
+```{r}
+#| eval: false
+write_rds(bkk_samples, "data/rds/bkk_samples.rds")
+write_rds(spk_samples, "data/rds/spk_samples.rds")
+
+```
+
+```{r}
+bkk_samples <- read_rds("data/rds/bkk_samples.rds")
+spk_samples <- read_rds("data/rds/spk_samples.rds")
+```
+
+## 6.4 NKDE Calculation
+
+**spNetwork** package supports 3 NKDE methods: simple, discontinuous and continuous. Gelb (2021) summarises the 3 methods as such:
+
+-   Simple: This method replaces Euclidean distances with network distances to estimate density along the network. It adapts the kernel formula to calculate density over a linear unit rather than an areal unit, making it intuitive but potentially biased.
+
+-   Discontinuous: This method addresses the bias in the simple method by ensuring the kernel function divides the density mass equally at intersections. It conserves mass, making it a more accurate estimator, but the density becomes discontinuous.
+
+-   Continuous: To overcome the discontinuity, this method adjusts the density before intersections to make the function continuous while still conserving mass, offering a more intuitive and smooth result.
+
+In the following code chunks, we will compare NKDE values across three different methods. After several attempts, we optimised the computation time by adjusting certain parameters: reducing the bandwidth (*bw*) to 500, setting the maximum depth (*max_depth*) to 8, aggregating 5 events within a certain distance (*agg*), and specifying a *grid_shape* of c(10, 10). With the gridded application of the NKDE, the calculation is then performed in each cell of the grid. These adjustments were necessary due to the large size of our dataset.
+
+:::panel-tabset
+## Simple
+
+```{r}
+#| eval: false
+
+bkk_nkde_simple <- nkde(bkk_network,
+                        events = bkk_acc,
+                        w = rep(1, nrow(bkk_acc)),
+                        samples = bkk_samples,
+                        kernel_name = "quartic",
+                        bw = 500, #<<
+                        div= "bw",
+                        method = "simple",
+                        digits = 1,
+                        tol = 1,
+                        grid_shape = c(10,10),
+                        max_depth = 8, #<<
+                        agg = 5, #<<
+                        sparse = TRUE,
+                        verbose = FALSE,
+                        study_area = bkk)
+```
+
+```{r}
+#| eval: false
+
+spk_nkde_simple <- nkde(spk_network,
+                        events = spk_acc,
+                        w = rep(1, nrow(spk_acc)),
+                        samples = spk_samples,
+                        kernel_name = "quartic",
+                        bw = 500, 
+                        div= "bw",
+                        method = "simple",
+                        digits = 1,
+                        tol = 1,
+                        grid_shape = c(10,10),
+                        max_depth = 8,
+                        agg = 5,
+                        sparse = TRUE,
+                        verbose = FALSE,
+                        study_area = spk)
+```
+
+## Discontinuous
+
+```{r}
+#| eval: false
+
+bkk_nkde_discon <- nkde(bkk_network,
+                        events = bkk_acc,
+                        w = rep(1, nrow(bkk_acc)),
+                        samples = bkk_samples,
+                        kernel_name = "quartic",
+                        bw = 500, 
+                        div= "bw",
+                        method = "discontinuous",
+                        digits = 1,
+                        tol = 1,
+                        grid_shape = c(10,10),
+                        max_depth = 8,
+                        agg = 5,
+                        sparse = TRUE,
+                        verbose = FALSE,
+                        study_area = bkk)
+```
+
+```{r}
+#| eval: false
+
+spk_nkde_discon <- nkde(spk_network,
+                        events = spk_acc,
+                        w = rep(1, nrow(spk_acc)),
+                        samples = spk_samples,
+                        kernel_name = "quartic",
+                        bw = 500, 
+                        div= "bw",
+                        method = "discontinuous",
+                        digits = 1,
+                        tol = 1,
+                        grid_shape = c(10,10),
+                        max_depth = 8,
+                        agg = 5,
+                        sparse = TRUE,
+                        verbose = FALSE,
+                        study_area = spk)
+```
+
+## Continuous
+
+```{r}
+#| eval: false
+
+bkk_nkde_cont <- nkde(bkk_network,
+                      events = bkk_acc,
+                      w = rep(1, nrow(bkk_acc)),
+                      samples = bkk_samples,
+                      kernel_name = "quartic",
+                      bw = 500, 
+                      div= "bw",
+                      method = "continuous",
+                      digits = 1,
+                      tol = 1,
+                      grid_shape = c(10,10),
+                      max_depth = 8,
+                      agg = 5,
+                      sparse = TRUE,
+                      verbose = FALSE,
+                      study_area = bkk)
+```
+
+```{r}
+#| eval: false
+
+spk_nkde_cont <- nkde(spk_network,
+                      events = spk_acc,
+                      w = rep(1, nrow(spk_acc)),
+                      samples = spk_samples,
+                      kernel_name = "quartic",
+                      bw = 500, 
+                      div= "bw",
+                      method = "continuous",
+                      digits = 1,
+                      tol = 1,
+                      grid_shape = c(10,10),
+                      max_depth = 8,
+                      agg = 5,
+                      sparse = TRUE,
+                      verbose = FALSE,
+                      study_area = spk)
+```
+:::
+
+```{r}
+#| eval: false
+write_rds(bkk_nkde_simple, "data/rds/bkk_nkde_simple.rds")
+write_rds(spk_nkde_simple, "data/rds/spk_nkde_simple.rds")
+
+write_rds(bkk_nkde_discon, "data/rds/bkk_nkde_discon.rds")
+write_rds(spk_nkde_discon, "data/rds/spk_nkde_discon.rds")
+
+write_rds(bkk_nkde_cont, "data/rds/bkk_nkde_cont.rds")
+write_rds(spk_nkde_cont, "data/rds/spk_nkde_cont.rds")
+
+```
+
+```{r}
+bkk_nkde_simple <- read_rds("data/rds/bkk_nkde_simple.rds")
+spk_nkde_simple <- read_rds("data/rds/spk_nkde_simple.rds")
+
+bkk_nkde_discon <- read_rds("data/rds/bkk_nkde_discon.rds")
+spk_nkde_discon <- read_rds("data/rds/spk_nkde_discon.rds")
+
+bkk_nkde_cont <- read_rds("data/rds/bkk_nkde_cont.rds")
+spk_nkde_cont <- read_rds("data/rds/spk_nkde_cont.rds")
+
+```
 
 ## 6.5 Visualising NKDE
 
+Before we can visualise the NKDE values, we have to patch in the computed density values into *samples* and *lixels*.
+
+To enhance the readability of the results, we first multiply the obtained densities by the total number of accidents. This adjustment ensures that the spatial integral equals the number of events. Subsequently, we multiply this value by 1000 to derive the estimated number of accidents per kilometer. This process will provide a more intuitive understanding of the density distribution along the network.
+
+```{r}
+# Bangkok
+bkk_samples$nkde_simple <- bkk_nkde_simple*nrow(bkk_acc)*1000
+bkk_lixels$nkde_simple <- bkk_nkde_simple*nrow(bkk_acc)*1000
+
+bkk_samples$nkde_discont <- bkk_nkde_discon*nrow(bkk_acc)*1000
+bkk_lixels$nkde_discont <- bkk_nkde_discon*nrow(bkk_acc)*1000
+
+bkk_samples$nkde_cont <- bkk_nkde_cont*nrow(bkk_acc)*1000
+bkk_lixels$nkde_cont <- bkk_nkde_cont*nrow(bkk_acc)*1000
+```
+
+```{r}
+# Samut Prakan
+spk_samples$nkde_simple <- spk_nkde_simple*nrow(spk_acc)*1000
+spk_lixels$nkde_simple <- spk_nkde_simple*nrow(spk_acc)*1000
+
+spk_samples$nkde_discont <- spk_nkde_discon*nrow(spk_acc)*1000
+spk_lixels$nkde_discont <- spk_nkde_discon*nrow(spk_acc)*1000
+
+spk_samples$nkde_cont <- spk_nkde_cont*nrow(spk_acc)*1000
+spk_lixels$nkde_cont <- spk_nkde_cont*nrow(spk_acc)*1000
+```
+
+:::panel-tabset
+
+## Bangkok
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+tmap_mode('view')
+bkk_nkde_simple_map <- tm_basemap("OpenStreetMap") +
+  tm_shape(bkk_lixels)+
+  tm_lines(col="nkde_simple", 
+           lwd = 2, 
+           palette = c("#f9edd1","#feb7c9","#f775a9", "#bb8bdc","#021c9e"),
+           id="nkde_cont")+
+  tm_shape(bkk_acc)+
+  tm_dots(size=0.01)
+
+bkk_nkde_discon_map <- tm_basemap("OpenStreetMap") +
+tm_shape(bkk_lixels)+
+  tm_lines(col="nkde_discont", 
+           lwd = 2, 
+           palette = c("#f9edd1","#feb7c9","#f775a9", "#bb8bdc","#021c9e"),
+           id="nkde_cont")+
+  tm_shape(bkk_acc)+
+  tm_dots(size=0.01) 
+
+bkk_nkde_cont_map <- tm_basemap("OpenStreetMap") +
+tm_shape(bkk_lixels)+
+  tm_lines(col="nkde_cont", 
+           lwd = 2, 
+           palette = c("#f9edd1","#feb7c9","#f775a9", "#bb8bdc","#021c9e"),
+           id="nkde_cont")+
+  tm_shape(bkk_acc)+
+  tm_dots(size=0.01)
+
+
+tmap_arrange(bkk_nkde_simple_map, 
+             bkk_nkde_discon_map, 
+             bkk_nkde_cont_map,
+             ncol=3,
+             nrow=1,
+             sync = TRUE
+             )
+```
+
+## Samut Prakan
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+tmap_mode('view')
+spk_nkde_simple_map <- tm_basemap(server = "OpenStreetMap") +
+  tm_shape(spk_lixels)+
+  tm_lines(col="nkde_simple", 
+           lwd = 2, 
+           palette = c("#f9edd1","#feb7c9","#f775a9", "#bb8bdc","#021c9e"), 
+           id="nkde_cont")+
+  tm_shape(spk_acc)+
+  tm_dots(size=0.01) 
+
+spk_nkde_discon_map <- tm_basemap(server = "OpenStreetMap") +
+tm_shape(spk_lixels)+
+  tm_lines(col="nkde_discont", 
+           lwd = 2, 
+           palette = c("#f9edd1","#feb7c9","#f775a9", "#bb8bdc","#021c9e"), 
+           id="nkde_cont")+
+  tm_shape(spk_acc)+
+  tm_dots(size=0.01)
+
+spk_nkde_cont_map <- tm_basemap(server = "OpenStreetMap") +
+tm_shape(spk_lixels)+
+  tm_lines(col="nkde_cont", 
+           lwd = 2, 
+           palette = c("#f9edd1","#feb7c9","#f775a9", "#bb8bdc","#021c9e"), 
+           id="nkde_cont")+
+  tm_shape(spk_acc)+
+  tm_dots(size=0.01)
+
+tmap_arrange(spk_nkde_simple_map, 
+             spk_nkde_discon_map, 
+             spk_nkde_cont_map,
+             ncol=3,
+             nrow=1,
+             sync = TRUE
+             )
+```
+
+:::
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+Although Network Kernel Density Estimation (NKDE) is a useful tool for visualising the impact of events on a road network, I found that the resulting NKDE maps weren't as insightful as expected. This could be due to the high density of traffic accident points, which might obscure meaningful patterns, or potentially due to errors in the code implementation :(
+
+To gain more detailed insights, I propose extending the analysis by focusing on smaller subsets of events, segmented by temporal patterns. In the next section, I will explore Temporal Network Kernel Density Estimation (TNKDE), which incorporates time-based factors such as the time of day or seasonality. By doing so, we can investigate how traffic accidents vary across different times and conditions, potentially revealing new patterns that NKDE alone may not capture.
+:::
 
 # 7 Temporal Network Kernel Density Estination (TNKDE)
 
+Temporal Network Kernel Density Estimation (TNKDE) is an advanced spatial analysis technique that integrates both spatial and temporal dimensions to provide a more nuanced understanding of event distributions along networks. Unlike traditional NKDE, which focuses solely on spatial data, TNKDE accounts for time-based variations such as time of day, day of the week, or even seasonal trends. This allows for a more detailed analysis of how events, like traffic accidents, fluctuate over both space and time.
 
-# 8 Conclusion
+The purpose of TNKDE is to capture temporal patterns within spatial networks, offering insights into how event intensities shift at different times. By incorporating time, TNKDE helps uncover spatio-temporal relationships that may be overlooked in a purely spatial analysis. This makes it especially useful for understanding dynamic events, like traffic accidents, where timing plays a critical role. Ultimately, TNKDE supports more informed decision-making for urban planning, road safety improvements, and traffic management by identifying accident hotspots based on specific temporal contexts.
 
-# 9 References
+## 7.1 Visualising Distribution
 
-
-
-The analysis approach will be threefold. Firstly, it compares temperature differentials between urban and rural landscapes. Subsequently, it investigates variations in temperature between wet and dry seasons. Lastly, it delves into the comparison of temperatures across different years.
+Recall the variables we derived in Section 3.1. Our TNKDE analysis will be focused on these factors:
 
 ```{mermaid}
 %%| fig-width: 8
 %%| echo: false
 
 flowchart TD
-    A[MSS Temperature Records] --> A1[Urban vs Rural] 
-    A1 -.-> A11[Urban: Changi]
-    A1 -.-> A12[Rural: Tengah]
-    A --> A2[Seasons]
-    A2 -.-> A21[Dry: June]
-    A2 -.-> A22[Wet: December]
-    A --> A3[Across Years]
-    A3 -.-> A31[1983 to 2023]
+    A[Variables] --> A1[Month] 
+    A1 -.-> A11[Jan to Dec]
+    A --> A2[Day]
+    A2 -.-> A21[Mon to Sun]
+    A --> A3[Hour]
+    A3 -.-> A31[00 to 23 hr]
+    A --> A4[Songkran?]
+    A4 -.-> A41[Yes]
+    A4 -.-> A42[No]
+    A --> A5[Weektype]
+    A5 -.-> A51[Weekday]
+    A5 -.-> A52[Weekend]
+    A --> A6[Season]
+    A6 -.-> A61[Summer]
+    A6 -.-> A62[Rainy]
+    A6 -.-> A63[Winter]
+    A --> A7[Peak Period]
+    A7 -.-> A71[Morning Peak] 
+    A7 -.-> A72[Evening Peak]    
+    A7 -.-> A73[Non-peak]    
+    
 
 ```
+
+Let's visualise the distribution:
+
+::: panel-tabset
+## Bangkok
+
+```{r}
+plot_month <- ggplot(data = bkk_acc,
+                        aes(x = month)) +
+  geom_bar()+
+  ylim(0, 800) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=2) +
+  labs(x = "Month",
+         y = "No. of Accidents",
+         title = "Accidents by Month") +
+  scale_x_continuous(breaks = 1:12) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+plot_day <- ggplot(data = bkk_acc,
+                        aes(x = day)) +
+  geom_bar()+
+  ylim(0, 1200) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=2) +
+  labs(x = "Month",
+         y = "No. of Accidents",
+         title = "Accidents by Day of Week") + 
+  scale_x_continuous(breaks = 1:7) +
+  theme_minimal() +
+  theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+plot_hour <- ggplot(data = bkk_acc,
+                        aes(x = hour)) +
+  geom_bar()+
+  ylim(0, 700) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=2,
+            angle = 45,
+            hjust = -0.25) +
+    labs(x = "Month",
+         y = "No. of Accidents",
+         title = "Accidents by Time of Day") + 
+    scale_x_continuous(breaks = 0:23) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+gridExtra::grid.arrange(plot_month, plot_day,
+                        plot_hour, 
+                        ncol=1, nrow = 3)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+plot_songkran <- ggplot(data = bkk_acc,
+                        aes(x = reorder(songkran, songkran, function(x)-length(x)))) +
+  geom_bar()+
+  ylim(0, 13500) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=3) +
+    labs(x = "Songkran?",
+         y = "No. of Accidents",
+         title = "Accidents During Songkran") + 
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_text(size = 6),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) +
+  scale_x_discrete(labels=c('No', 'Yes'))
+
+plot_weektype <- ggplot(data = bkk_acc,
+                        aes(x = reorder(weektype, weektype, function(x)-length(x)))) +
+  geom_bar()+
+  ylim(0, 6000) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=3) +
+    labs(x = "Weektype",
+         y = "No. of Accidents",
+         title = "Accidents by Weektype") + 
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+plot_season <- ggplot(data = bkk_acc,
+                        aes(x = reorder(season, season, function(x)-length(x)))) +
+  geom_bar()+
+  ylim(0, 6000) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=3) +
+    labs(x = "Season",
+         y = "No. of Accidents",
+         title = "Accidents by Season") + 
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_text(size = 6),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+plot_peakperiod <- ggplot(data = bkk_acc,
+                        aes(x = reorder(peakperiod, peakperiod, function(x)-length(x)))) +
+  geom_bar()+
+  ylim(0, 6000) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=3) +
+    labs(x = "Season",
+         y = "No. of Accidents",
+         title = "Accidents by Peak/Non-Peak Period") + 
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+gridExtra::grid.arrange(plot_songkran, plot_weektype,
+                        plot_season, plot_peakperiod,
+                        ncol=2, nrow = 2)
+```
+
+## Samut Prakan
+
+```{r}
+plot_month_spk <- ggplot(data = spk_acc,
+                        aes(x = month)) +
+  geom_bar()+
+  ylim(0, 300) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=2) +
+  labs(x = "Month",
+         y = "No. of Accidents",
+         title = "Accidents by Month") +
+  scale_x_continuous(breaks = 1:12) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+plot_day_spk <- ggplot(data = spk_acc,
+                        aes(x = day)) +
+  geom_bar()+
+  ylim(0, 500) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=2) +
+  labs(x = "Month",
+         y = "No. of Accidents",
+         title = "Accidents by Day of Week") + 
+  scale_x_continuous(breaks = 1:7) +
+  theme_minimal() +
+  theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+plot_hour_spk <- ggplot(data = spk_acc,
+                        aes(x = hour)) +
+  geom_bar()+
+  ylim(0, 300) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=2,
+            angle = 45,
+            hjust = -0.25) +
+    labs(x = "Month",
+         y = "No. of Accidents",
+         title = "Accidents by Time of Day") + 
+    scale_x_continuous(breaks = 0:23) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+gridExtra::grid.arrange(plot_month_spk, plot_day_spk,
+                        plot_hour_spk, 
+                        ncol=1, nrow = 3)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+plot_songkran_spk <- ggplot(data = spk_acc,
+                        aes(x = reorder(songkran, songkran, function(x)-length(x)))) +
+  geom_bar()+
+  ylim(0, 3000) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=3) +
+    labs(x = "Songkran?",
+         y = "No. of Accidents",
+         title = "Accidents During Songkran") + 
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_text(size = 6),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) +
+  scale_x_discrete(labels=c('No', 'Yes'))
+
+plot_weektype_spk <- ggplot(data = spk_acc,
+                        aes(x = reorder(weektype, weektype, function(x)-length(x)))) +
+  geom_bar()+
+  ylim(0, 2000) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=3) +
+    labs(x = "Weektype",
+         y = "No. of Accidents",
+         title = "Accidents by Weektype") + 
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+plot_season_spk <- ggplot(data = spk_acc,
+                        aes(x = reorder(season, season, function(x)-length(x)))) +
+  geom_bar()+
+  ylim(0, 1500) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=3) +
+    labs(x = "Season",
+         y = "No. of Accidents",
+         title = "Accidents by Season") + 
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_text(size = 6),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+plot_peakperiod_spk <- ggplot(data = spk_acc,
+                        aes(x = reorder(peakperiod, peakperiod, function(x)-length(x)))) +
+  geom_bar()+
+  ylim(0, 2500) + 
+  geom_text(stat="count", 
+            aes(label=paste0(after_stat(count), ", ",
+                             round(after_stat(count)/sum(after_stat(count))*100, 1), "%")),
+            vjust=-1,
+            size=3) +
+    labs(x = "Season",
+         y = "No. of Accidents",
+         title = "Accidents by Peak/Non-Peak Period") + 
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank(),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9")
+    ) 
+
+gridExtra::grid.arrange(plot_songkran_spk, plot_weektype_spk,
+                        plot_season_spk, plot_peakperiod_spk,
+                        ncol=2, nrow = 2)
+```
+:::
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+We observe a significantly higher number of accidents occurring during non-peak periods and on weekdays in both Bangkok and Samut Prakan. Additionally, a notable proportion of accidents take place during the rainy season in these provinces.
+
+Upon closer examination, while the distribution of accidents across different days of the week and months appears fairly even, there is considerable variability in occurrences at different times of day. In Bangkok, the peak times are particularly from 7 AM to 11 AM and around 4 PM and 7 PM. In Samut Prakan, accident occurrences are notably higher between 7 AM and 8 PM compared to other times.
+
+Interestingly, despite many reports highlighting elevated accident rates during the Songkran festival, incidents during this week-long event account for less than 5% of the total accidents recorded in the study period.
+:::
+
+## 7.2 Temporal Dimension
+
+Next, we will compute kernel density estimates of accidents over time using multiple bandwidths with the `tnkde()` function from the **spNetwork** package. TNKDE requires two bandwidths: one for spatial data and one for temporal data. In this section, we will explore three different methods for selecting bandwidths:
+
+-   *bw_bcv*: Utilises biased cross-validation to find the bandwidth that minimises estimation errors.
+-   *bw_ucv*: Implements unbiased cross-validation for bandwidth selection.
+-   *bw_SJ*: Estimates bandwidths using pilot estimation of derivatives.
+
+**Steps:**
+
+1.  We will start by creating a vector called *weight* that will have the same number of elements as rows in the *bkk_acc* dataset, which will be used as the weighting factor in the TNKDE calculations.
+2.  After that, we'll generate a sequence of numbers ranging from 0 to the maximum value in the hour column of the *bkk_acc* data frame, with intervals of 0.5. These points will serve as the sample locations for estimating the density.
+3.  Next, we'll calculate the bandwidth values for the hour column using the three bandwidth selection methods mentioned earlier.
+4.  Once the bandwidth values are obtained, we will perform the TNKDE analysis using the `tkde()` function from the **spPackage** and then create a data frame called *tk* to store the resulting density estimates.
+5.  Finally, we will apply the melt function from the **reshape2** package to reshape the *tk* data frame into a new data frame named *df_hour*, using the *hour* variable as the identifier.
+
+```{r}
+## Bangkok
+weight_bkk <- rep(1, nrow(bkk_acc))
+samples_bkk <- seq(0, max(bkk_acc$hour), 0.5)
+
+bw_bcv_bkk <- bw.bcv(bkk_acc$hour)
+bw_ucv_bkk <- bw.ucv(bkk_acc$hour)
+bw_SJ_bkk <- bw.SJ(bkk_acc$hour)
+
+tk_bkk <- data.frame(
+  bw_bcv = tkde(bkk_acc$hour, w = weight_bkk, samples = samples_bkk, bw = bw_bcv_bkk, kernel_name = "quartic"),
+  bw_ucv = tkde(bkk_acc$hour, w = weight_bkk, samples = samples_bkk, bw = bw_ucv_bkk, kernel_name = "quartic"),
+  bw_SJ = tkde(bkk_acc$hour, w = weight_bkk, samples = samples_bkk, bw = bw_SJ_bkk, kernel_name = "quartic"),
+  hour = samples_bkk
+)
+
+df_hour_bkk <- reshape2::melt(tk_bkk,
+                          id.vars = "hour")
+
+## Sanut Prakan
+weight_spk <- rep(1, nrow(spk_acc))
+samples_spk <- seq(0, max(spk_acc$hour), 0.5)
+
+bw_bcv_spk <- bw.bcv(spk_acc$hour)
+bw_ucv_spk <- bw.ucv(spk_acc$hour)
+bw_SJ_spk <- bw.SJ(spk_acc$hour)
+
+tk_spk <- data.frame(
+  bw_bcv = tkde(spk_acc$hour, w = weight_spk, samples = samples_spk, bw = bw_bcv_spk, kernel_name = "quartic"),
+  bw_ucv = tkde(spk_acc$hour, w = weight_spk, samples = samples_spk, bw = bw_ucv_spk, kernel_name = "quartic"),
+  bw_SJ = tkde(spk_acc$hour, w = weight_spk, samples = samples_spk, bw = bw_SJ_spk, kernel_name = "quartic"),
+  hour = samples_spk
+)
+
+df_hour_spk <- reshape2::melt(tk_spk,
+                          id.vars = "hour")
+```
+
+::: panel-tabset
+## Bangkok
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+plot_tk_bkk <- ggplot(data = df_hour_bkk,
+                  aes(x = hour, y = value)) +
+  geom_line()+
+  theme_minimal() +
+  theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title = element_text(size = 8),
+      axis.text = element_text(size = 6),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9"),
+      strip.background=element_rect(fill="#f4e9e8")
+    ) +
+  facet_wrap(vars(variable), ncol=1, nrow=3, scales = "free") +
+  scale_x_continuous(breaks = 0:23)
+
+plot_tk_bkk
+```
+
+## Samut Prakan
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+plot_tk_spk <- ggplot(data = df_hour_spk,
+                  aes(x = hour, y = value)) +
+  geom_line()+
+  theme_minimal() +
+  theme(
+      plot.title = element_text(face="bold", size = 8),
+      axis.title = element_text(size = 8),
+      axis.text = element_text(size = 6),
+      plot.background=element_rect(fill="#E4D5C9",colour="#E4D5C9"),
+      strip.background=element_rect(fill="#f4e9e8")
+    ) +
+  facet_wrap(vars(variable), ncol=1, nrow=3, scales = "free") +
+  scale_x_continuous(breaks = 0:23)
+
+plot_tk_spk
+```
+:::
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+Both *bw_ucv* and *bw_SJ* display a wider range of values and more fluctuations. In contrast, *bw_bcv* shows a smoother pattern with less variability in its range. The differences in these plots highlight how the choice of bandwidth can significantly affect the resulting density estimate.
+
+These differences in the plots emphasise how the choice of bandwidth can have a substantial impact on the resulting density estimates.
+:::
+
+## 7.3 Optimal Bandwidths
+
+For effective implementation of TNKDE, it's essential to consider both spatial and temporal dimensions. To achieve this, we can use the leave-one-out cross-validation method to determine appropriate bandwidths for both aspects. The `bw_tnkde_cv_likelihood_calc()` function from **spNetwork** can be employed to evaluate the cross-validation likelihood for various bandwidths, allowing us to select the most fitting options for both the network and time dimensions based on data-driven insights.
+
+In the code chunk below, the following arguments are used: - *bws_net*: An ordered numeric vector with all the network bandwidths consisting of range (starting, ending value), and step size. - *bws_time*: An ordered numeric vector with all the time bandwidths with range (starting, ending value), and step size. - *lines*: linestrings representing the underlying network - *events*: points representing the events on the network i.e. our points of accidents - *timefield*: this is the hour column derived in our earlier calculation - *agg*, *max_depth*, *grid_shape* are kept consistent from our NKDE calculations.
+
+::: panel-tabset
+## Bangkok
+
+```{r}
+cv_bkk <- bw_tnkde_cv_likelihood_calc(
+  bws_net = seq(100,1000,100),
+  bws_time = seq(10,60,5),
+  lines = bkk_network,
+  events = bkk_acc,
+  time_field = "hour",
+  w = rep(1, nrow(bkk_acc)),
+  kernel_name = "quartic",
+  method = "discontinuous", 
+  diggle_correction = FALSE,
+  study_area = NULL,
+  max_depth = 8,
+  digits = 1,
+  tol = 0.1,
+  agg = 5,
+  sparse=TRUE,
+  grid_shape=c(10,10),
+  sub_sample=1,
+  verbose = FALSE,
+  check = TRUE)
+```
+
+To visualise the output:
+
+```{r}
+knitr::kable(cv_bkk)
+```
+
+## Samut Prakan
+
+```{r}
+cv_spk <- bw_tnkde_cv_likelihood_calc(
+  bws_net = seq(100,1000,100),
+  bws_time = seq(10,60,5),
+  lines = spk_network,
+  events = spk_acc,
+  time_field = "hour",
+  w = rep(1, nrow(spk_acc)),
+  kernel_name = "quartic",
+  method = "discontinuous", 
+  diggle_correction = FALSE,
+  study_area = NULL,
+  max_depth = 8,
+  digits = 1,
+  tol = 0.1,
+  agg = 5,
+  sparse=TRUE,
+  grid_shape=c(10,10),
+  sub_sample=1,
+  verbose = FALSE,
+  check = TRUE)
+```
+
+To visualise the output:
+
+```{r}
+knitr::kable(cv_spk)
+```
+:::
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+The optimal set of bandwidths that gives the least cv score is 1000 metres and 25 hrs.
+:::
+
+## 7.4 Calculating TNKDE
+
+Using the optimal set of spatial and temporal bandwidths, we can perform TNKDE calculation.
+
+We first create a sequence of hourly time points from our dataset. `min()` retrieves the minimum value while `max()` retrieves the maximum value from the *hour* column. `seq()` generates a sequence of numbers from the minimum hour and ending at the maximum hour, with an increment of 1 (i.e. giving us hourly intervals). This sequence will be used to visualise accident data at different times of the day.
+
+::: panel-tabset
+## Bangkok
+
+```{r}
+bkk_sample_time <- seq(min(bkk_acc$hour), max(bkk_acc$hour), 1)
+```
+
+```{r}
+#| eval: false
+bkk_tnkde_densities <- tnkde(lines = bkk_network,
+                   events = bkk_acc,
+                   time_field = "hour",
+                   w = rep(1, nrow(bkk_acc)), 
+                   samples_loc = bkk_samples,
+                   samples_time = bkk_sample_time, 
+                   kernel_name = "quartic",
+                   bw_net = 1000, bw_time = 25,
+                   adaptive = TRUE,
+                   trim_bw_net = 900,
+                   trim_bw_time = 8,
+                   method = "discontinuous",
+                   div = "bw", max_depth = 8,
+                   digits = 1, tol = 0.01,
+                   agg = 5, grid_shape = c(10,10), 
+                   verbose  = FALSE)
+```
+
+```{r}
+#| eval: false
+write_rds(bkk_tnkde_densities, "data/rds/bkk_tnkde_densities.rds")
+```
+
+```{r}
+bkk_tnkde_densities <- read_rds("data/rds/bkk_tnkde_densities.rds")
+```
+
+## Samut Prakan
+
+```{r}
+spk_sample_time <- seq(min(spk_acc$hour), max(spk_acc$hour), 1)
+```
+
+```{r}
+#| eval: false
+
+spk_tnkde_densities <- tnkde(lines = spk_network,
+                   events = spk_acc,
+                   time_field = "hour",
+                   w = rep(1, nrow(spk_acc)), 
+                   samples_loc = spk_samples,
+                   samples_time = spk_sample_time, 
+                   kernel_name = "quartic",
+                   bw_net = 1000, bw_time = 25,
+                   adaptive = TRUE,
+                   trim_bw_net = 900,
+                   trim_bw_time = 8,
+                   method = "discontinuous",
+                   div = "bw", max_depth = 8,
+                   digits = 1, tol = 0.01,
+                   agg = 5, grid_shape = c(10,10), 
+                   verbose  = FALSE)
+```
+
+```{r}
+#| eval: false
+write_rds(spk_tnkde_densities, "data/rds/spk_tnkde_densities.rds")
+```
+
+```{r}
+spk_tnkde_densities <- read_rds("data/rds/spk_tnkde_densities.rds")
+```
+:::
+
+## 7.5 Visualising TNKDE
+
+### 7.5.1 Bangkok
+
+```{r}
+#| eval: false
+# Create a color palette for all the densities
+all_densities_bkk <- c(bkk_tnkde_densities$k)
+color_breaks_bkk <- classInt::classIntervals(all_densities_bkk, 
+                                             n = 10, 
+                                             style = "kmeans")
+
+# Generate a map at each sample time
+maps_bkk <- lapply(1:ncol(bkk_tnkde_densities$k), function(i){
+  time <- bkk_sample_time[[i]]
+  
+  bkk_samples$tnkde_density <- bkk_tnkde_densities$k[,i]
+  
+  map1 <- tm_shape(bkk_samples) + 
+  tm_dots(col = "tnkde_density", size = 0.01,
+          breaks = color_breaks_bkk$brks, 
+          palette = viridis::viridis(10)) + 
+    tm_layout(legend.show=FALSE, 
+              main.title = paste("TNKDE of Accidents in Bangkok - ", as.character(time), ":00"), 
+              main.title.size = 0.5,
+              bg.color = "#E4D5C9",
+              frame = F)
+  return(map1)
+})
+
+# Create a gif with all the maps
+tmap_animation(maps_bkk, filename = "images/tnkde_bkk.gif", 
+               width = 1000, height = 1000, dpi = 300, delay = 50)
+
+```
+
+```{r}
+#| echo: false
+knitr::include_graphics("images/tnkde_bkk.gif")
+
+```
+
+Although hotspot locations shift on an hourly basis, the hourly maps visually smooth out these changes between hours. In the animation below, we applied the same process but with a 3-hour interval, allowing for clearer visualisation of hotspot variations over time.
+
+```{r}
+#| echo: false
+knitr::include_graphics("images/tnkde_bkk_3hr.gif")
+
+```
+
+### 7.5.2 Samut Prakan
+
+```{r}
+#| eval: false
+
+# Create a color palette for all the densities
+all_densities_spk <- c(spk_tnkde_densities$k)
+color_breaks_spk <- classInt::classIntervals(all_densities_spk, n = 10, style = "kmeans")
+
+# Generate a map at each sample time
+maps_spk <- lapply(1:ncol(spk_tnkde_densities$k), function(i){
+  time <- spk_sample_time[[i]]
+  
+  spk_samples$tnkde_density <- spk_tnkde_densities$k[,i]
+  map1 <- tm_shape(spk_samples) + 
+  tm_dots(col = "tnkde_density", size = 0.01,
+          breaks = color_breaks_spk$brks, palette = viridis::viridis(10)) + 
+    tm_layout(legend.show=FALSE, 
+              main.title = paste("TNKDE of Accidents in Samut Prakan - ", as.character(time), ":00"), 
+              main.title.size = 0.5,
+              bg.color = "#E4D5C9",
+              frame = F)
+  return(map1)
+})
+
+# Create a gif with all the maps
+tmap_animation(maps_spk, filename = "images/tnkde_spk.gif", 
+               width = 1000, height = 1000, dpi = 300, delay = 50)
+```
+
+```{r}
+#| echo: false
+
+knitr::include_graphics("images/tnkde_spk.gif")
+```
+
+Using 3-hour intervals:
+
+```{r}
+#| echo: false
+
+knitr::include_graphics("images/tnkde_spk_3hr.gif")
+```
+
+::: {.lightbox .light data-latex="light"}
+**Observations**
+
+In Section 7.1, we identified specific time windows---7am to 11am, 4pm, and 7pm---as periods with higher accident occurrences in Bangkok province. The TNKDE map for Bangkok aligns with these observations, revealing more prominent accident hotspots (highlighted by brighter colors) as the day progresses, while fewer hotspots are seen from late night through early morning. Notably, the areas with consistent hotspots throughout the day appear to be concentrated along major highways, which are likely key transport routes in Bangkok, contributing to the elevated accident rates. Fewer accidents are observed outside these primary roads.
+
+Similarly, in the previous section, we identified 7am to 8pm as the period with the highest frequency of accidents in Samut Prakan. This observation is supported by the TNKDE map, which shows that accident hotspots remain fairly consistent throughout the day and significantly diminish in the early morning hours. Like Bangkok, the accident clusters in Samut Prakan tend to occur in the same areas throughout the day, suggesting these are high-traffic routes or major roads.
+
+The TNKDE maps provide more granular insights into how accident clusters evolve over time, offering a clearer picture of how accidents are spatially concentrated across different times of day. This enhanced level of detail aids in understanding how accident hotspots shift temporally and spatially within the network. Such insights can be instrumental for traffic safety planning, as they allow for the identification of critical accident-prone areas and trends over time. Overall, the TNKDE approach delivers a robust analysis of both spatial and temporal clustering, offering a deeper and more comprehensive understanding of the patterns that drive accident occurrences across the network.
+:::
+
+# 8 Conclusion
+
+This study examined different methods of spatial point pattern analysis using road accident data from Thailand. We utilised three distinct approaches: Traditional Kernel Density Estimation (KDE), Network-Constrained Kernel Density Estimation (NKDE), and Temporal Network Kernel Density Estimation (TNKDE). These techniques helped uncover both spatial and temporal trends in accident clustering within the Bangkok Metropolitan Region (BMR).
+
+We experimented with various bandwidth selection techniques and kernel functions, comparing the outcomes for each combination. We produced three KDE maps using different strategies: fixed bandwidth, adaptive nearest neighbor, and adaptive kernel density. These maps pinpointed potential accident hotspots in two provinces within the BMR, namely Bangkok and Samut Prakan, where accidents showed significant spatial clustering.
+
+A key part of our analysis involved comparing the performance of traditional, pixel-based KDE with network-based NKDE. Traditional KDE was limited in its ability to capture the spatial distribution of accidents along road networks due to its reliance on Euclidean distance. NKDE, on the other hand, offered a more precise and accurate representation by accounting for the constraints of road networks. This approach led to a more nuanced understanding of accident hotspots, providing clearer and more reliable results than the traditional method.
+
+The introduction of TNKDE added further depth to the analysis by incorporating time as a factor, allowing us to observe how accident clusters vary over different time intervals. This provided a more dynamic perspective on the spatial distribution of accidents.
+
+Looking ahead, future research could incorporate additional data from the original Thailand Road Accidents dataset, such as weather conditions, road type, and traffic characteristics, to provide a more holistic view of the factors contributing to road accidents. Integrating these variables could enhance the analysis and offer a richer understanding of accident patterns.
+
+# 9 References
+
+Gelb, J. (2021). spNetwork: A Package for Network Kernel Density Estimation. *The R Journal, 13*(2). <https://journal.r-project.org/archive/2021/RJ-2021-102/RJ-2021-102.pdf>
+
+Gelb, J. (2024). Temporal Network Kernel Density Estimate. *spNetwork.* <https://jeremygelb.github.io/spNetwork/articles/TNKDE.html#spatio-temporal>
+
+Gelb, J. (2024). Network Kernel Density Estimate. *spNetwork.* <https://jeremygelb.github.io/spNetwork/articles/NKDE.html>
+
+Kam, T.S. (2023). 1st Order Spatial Point Patterns Analysis Methods. *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap04>
+
+Kam, T.S. (2023). 2nd Order Spatial Point Patterns Analysis Methods. *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap05>
+
+Kam, T.S. (2023). Spatio-Temporal Point Patterns Analysis. *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap06>
+
+Kam, T.S. (2023). Network Constrained Spatial Point Patterns Analysis. *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap07>

@@ -6,7 +6,6 @@ listing:
   contents:
     - "Hands-on_Ex/*/*.qmd"
     - "Take-home_Ex/*/*.qmd"
-    - "In-class_Ex/*/*.qmd"
   sort: 
     - "date desc"
     - "title desc"

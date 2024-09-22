@@ -43,32 +43,9 @@ website:
           - text: 10 Modelling Geographical Accessibility
             href: Hands-on_Ex/Hands-on_Ex10/Hands-on_Ex10.html 
             
-      - text: "In-class Exercises"
-        menu: 
-          - text: 1 Geospatial Data Science with R
-            href: In-class_Ex/In-class_Ex01/In-class_Ex01.html
-          - text: 2 Importing Data for Thailand Road Accident Case Study
-            href: In-class_Ex/In-class_Ex02/In-class_Ex02.html  
-          - text: 3/
-            href: In-class_Ex/In-class_Ex03/In-class_Ex03.html    
-          - text: 4/
-            href: In-class_Ex/In-class_Ex04/In-class_Ex04.html
-          - text: 5/
-            href: In-class_Ex/In-class_Ex05/In-class_Ex05.html 
-          - text: 6/
-            href: In-class_Ex/In-class_Ex06/In-class_Ex06.html  
-          - text: 7/
-            href: In-class_Ex/In-class_Ex07/In-class_Ex07.html              
-          - text: 8/
-            href: In-class_Ex/In-class_Ex08/In-class_Ex08.html  
-          - text: 9/
-            href: In-class_Ex/In-class_Ex09/In-class_Ex09.html  
-          - text: 10/
-            href: In-class_Ex/In-class_Ex10/In-class_Ex10.html  
-            
       - text: "Take-home Exercises"
         menu: 
-          - text: 1/
+          - text: 1 Understanding and Analysing Thailand Road Accident Data
             href: Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html    
           - text: 2/
             href: Take-Home_Ex/Take-Home_Ex02/Take-Home_Ex02.html  
