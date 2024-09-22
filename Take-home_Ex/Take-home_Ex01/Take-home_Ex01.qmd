@@ -227,11 +227,13 @@ duplicate
 Results confirm that there are no duplicated records found.
 
 ```{r}
+#| echo: false
 #| eval: false
 write_rds(accidents_bmr, "data/rds/accidents_bmr.rds")
 ```
 
 ```{r}
+#| echo: false
 accidents_bmr <- read_rds("data/rds/accidents_bmr.rds")
 ```
 
@@ -284,11 +286,13 @@ adminboundary_bmr <- adminboundary %>%
 ```
 
 ```{r}
+#| echo: false
 #| eval: false
 write_rds(adminboundary_bmr, "data/rds/adminboundary_bmr.rds")
 ```
 
 ```{r}
+#| echo: false
 adminboundary_bmr <- read_rds("data/rds/adminboundary_bmr.rds")
 ```
 
@@ -338,6 +342,7 @@ tm_shape(accidents_bmr) +
 The code chunk below imports *MP_SUBZONE_WEB_PL* shapefile by using `st_read()` of *sf* packages.
 
 ```{r}
+#| eval: false
 roads <- st_read(dsn = "data/geospatial", 
                 layer = "hotosm_tha_roads_lines_shp")
 ```
@@ -351,28 +356,35 @@ roads <- st_read(dsn = "data/geospatial",
 :::
 
 ```{r}
+#| eval: false
 roads_sf <- st_set_crs(roads, 4326) %>% 
   st_transform(crs = 32647) %>% 
   st_cast("LINESTRING")
 ```
 
 ```{r}
+#| echo: false
+#| eval: false
+write_rds(roads_sf, "data/rds/roads_sf.rds")
+```
+
+```{r}
+#| echo: false
+#| eval: false
+roads_sf <- read_rds("data/rds/roads_sf.rds")
+```
+
+
+```{r}
+#| eval: false
 st_crs(roads_sf)
 ```
 
-Results above show that the EPSG is indicated as 32647 now.
+Results of the code above show that the EPSG is indicated as 32647 now.
 
 ```{r}
-glimpse(roads_sf)
-```
-
-```{r}
-roads_sf
-```
-
-Next, we will look at the classification of road networks in the data.
-
-```{r}
+#| echo: false
+#| eval: false
 unique(roads_sf$highway)
 ```
 
@@ -401,6 +413,7 @@ Upon reviewing the road classifications against the [highway descriptions by Ope
 In the code chunk below, we will first specify the road classes that we want to retain. Next, we will filter *roads_sf* object to remove all the rows that does not have our desired *highway* attribute value.
 
 ```{r}
+#| eval: false
 highwaytypes <- c("primary",
                   "primary_link", 
                   "secondary", 
@@ -418,25 +431,24 @@ highwaytypes <- c("primary",
 roads_sf_filtered <- roads_sf %>%
   select("highway") %>% 
   filter(highway %in% highwaytypes)
-
-unique(roads_sf_filtered$highway)
 ```
 
 Since the *roads* dataset includes areas outside BMR and our analysis is focused on the region within the BMR, we will need to remove unnecessary rows. To do so, we will use `st_intersection()`.
 
 ```{r}
 #| eval: false
-
 roads_bmr <- st_intersection(roads_sf_filtered,
                              adminboundary_bmr)
 ```
 
 ```{r}
+#| echo: false
 #| eval: false
 write_rds(roads_bmr, "data/rds/roads_bmr.rds")
 ```
 
 ```{r}
+#| echo: false
 roads_bmr <- read_rds("data/rds/roads_bmr.rds")
 ```
 
@@ -1221,12 +1233,22 @@ The code chunk below performs the following functions:
 -   Similar to the road network extraction, the `st_intersection()` function is used to find the accidents (from *accidents_bmr_extra*, which contains accident data for the BMR) that fall within the Bangkok and Samut Prakan boundaries.
 
 ```{r}
+#| eval: false
 # Road Network
 bkk_network <- st_intersection(roads_bmr, st_union(bkk)) %>% 
   filter(st_geometry_type(.) == "LINESTRING")
 
 spk_network <- st_intersection(roads_bmr, st_union(spk)) %>% 
   filter(st_geometry_type(.) == "LINESTRING")
+
+write_rds(bkk_network, "data/rds/bkk_network.rds")
+write_rds(spk_network, "data/rds/spk_network.rds")
+```
+
+```{r}
+#| echo: false
+bkk_network <- read_rds("data/rds/bkk_network.rds")
+spk_network <- read_rds("data/rds/spk_network.rds")
 ```
 
 ```{r}
@@ -1235,33 +1257,14 @@ spk_network <- st_intersection(roads_bmr, st_union(spk)) %>%
 bkk_acc <- st_intersection(accidents_bmr_extra, bkk)
 spk_acc <- st_intersection(accidents_bmr_extra, spk)
 
-```
-
-```{r}
-#| eval: false
 write_rds(bkk_acc, "data/rds/bkk_acc.rds")
 write_rds(spk_acc, "data/rds/spk_acc.rds")
 ```
 
 ```{r}
+#| echo: false
 bkk_acc <- read_rds("data/rds/bkk_acc.rds")
 spk_acc <- read_rds("data/rds/spk_acc.rds")
-```
-
-```{r}
-#| echo: true
-#| eval: false
-
-bkk_network.snapped <- snapPointsToLines2(bkk_network, roads_bmr)
-spk_network.snapped <- snapPointsToLines2(spk_network, roads_bmr)
-```
-
-```{r}
-#| echo: true
-#| eval: false
-
-rm(bkk_network.snapped)
-rm(spk_network.snapped)
 ```
 
 ## 6.2 Preparing lixel objects
@@ -1273,6 +1276,7 @@ In the code chunk below, each lixel is set to a length of 500 meters, while the 
 Since we have narrowed down to the 2 provinces where road traffic accidents can be highly clustered around certain hotspots, a smaller lixel size (i.e., 500 meters) might offer more detailed insights into local variations in accident density. Larger lixels, like 1000 meters, can potentially smooth out these variations, missing critical hotspots, especially in densely populated urban areas.
 
 ```{r}
+#| eval: false
 bkk_lixels <- lixelize_lines(bkk_network, 
                          500, 
                          mindist = 250)
@@ -1280,7 +1284,17 @@ bkk_lixels <- lixelize_lines(bkk_network,
 spk_lixels <- lixelize_lines(spk_network, 
                          500, 
                          mindist = 250)
+
+write_rds(bkk_lixels, "data/rds/bkk_lixels.rds")
+write_rds(spk_lixels, "data/rds/spk_lixels.rds")
 ```
+
+```{r}
+#| echo: false
+bkk_lixels <- read_rds("data/rds/bkk_lixels.rds")
+spk_lixels <- read_rds("data/rds/spk_lixels.rds")
+```
+
 
 ## 6.3 Generating line centre points
 
@@ -1288,19 +1302,20 @@ Next, `lines_center()` of **spNetwork** will be used to generate a SpatialPoints
 
 ```{r}
 #| eval: false
-
 bkk_samples <- lines_center(bkk_lixels)
 spk_samples <- lines_center(spk_lixels)
 ```
 
 ```{r}
 #| eval: false
+#| echo: false
 write_rds(bkk_samples, "data/rds/bkk_samples.rds")
 write_rds(spk_samples, "data/rds/spk_samples.rds")
 
 ```
 
 ```{r}
+#| echo: false
 bkk_samples <- read_rds("data/rds/bkk_samples.rds")
 spk_samples <- read_rds("data/rds/spk_samples.rds")
 ```
@@ -1322,7 +1337,6 @@ In the following code chunks, we will compare NKDE values across three different
 
 ```{r}
 #| eval: false
-
 bkk_nkde_simple <- nkde(bkk_network,
                         events = bkk_acc,
                         w = rep(1, nrow(bkk_acc)),
@@ -1343,7 +1357,6 @@ bkk_nkde_simple <- nkde(bkk_network,
 
 ```{r}
 #| eval: false
-
 spk_nkde_simple <- nkde(spk_network,
                         events = spk_acc,
                         w = rep(1, nrow(spk_acc)),
@@ -1366,7 +1379,6 @@ spk_nkde_simple <- nkde(spk_network,
 
 ```{r}
 #| eval: false
-
 bkk_nkde_discon <- nkde(bkk_network,
                         events = bkk_acc,
                         w = rep(1, nrow(bkk_acc)),
@@ -1387,7 +1399,6 @@ bkk_nkde_discon <- nkde(bkk_network,
 
 ```{r}
 #| eval: false
-
 spk_nkde_discon <- nkde(spk_network,
                         events = spk_acc,
                         w = rep(1, nrow(spk_acc)),
@@ -1410,7 +1421,6 @@ spk_nkde_discon <- nkde(spk_network,
 
 ```{r}
 #| eval: false
-
 bkk_nkde_cont <- nkde(bkk_network,
                       events = bkk_acc,
                       w = rep(1, nrow(bkk_acc)),
@@ -1431,7 +1441,6 @@ bkk_nkde_cont <- nkde(bkk_network,
 
 ```{r}
 #| eval: false
-
 spk_nkde_cont <- nkde(spk_network,
                       events = spk_acc,
                       w = rep(1, nrow(spk_acc)),
@@ -1453,6 +1462,7 @@ spk_nkde_cont <- nkde(spk_network,
 
 ```{r}
 #| eval: false
+#| echo: false
 write_rds(bkk_nkde_simple, "data/rds/bkk_nkde_simple.rds")
 write_rds(spk_nkde_simple, "data/rds/spk_nkde_simple.rds")
 
@@ -1465,6 +1475,7 @@ write_rds(spk_nkde_cont, "data/rds/spk_nkde_cont.rds")
 ```
 
 ```{r}
+#| echo: false
 bkk_nkde_simple <- read_rds("data/rds/bkk_nkde_simple.rds")
 spk_nkde_simple <- read_rds("data/rds/spk_nkde_simple.rds")
 
@@ -1510,6 +1521,8 @@ spk_lixels$nkde_cont <- spk_nkde_cont*nrow(spk_acc)*1000
 
 ## Bangkok
 ```{r}
+#| eval: false
+
 #| code-fold: true
 #| code-summary: "Show the code"
 
@@ -1554,6 +1567,8 @@ tmap_arrange(bkk_nkde_simple_map,
 ## Samut Prakan
 
 ```{r}
+#| eval: false
+
 #| code-fold: true
 #| code-summary: "Show the code"
 
@@ -1649,6 +1664,8 @@ Let's visualise the distribution:
 ## Bangkok
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 plot_month <- ggplot(data = bkk_acc,
                         aes(x = month)) +
   geom_bar()+
@@ -1722,7 +1739,6 @@ gridExtra::grid.arrange(plot_month, plot_day,
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-
 plot_songkran <- ggplot(data = bkk_acc,
                         aes(x = reorder(songkran, songkran, function(x)-length(x)))) +
   geom_bar()+
@@ -1812,6 +1828,8 @@ gridExtra::grid.arrange(plot_songkran, plot_weektype,
 ## Samut Prakan
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 plot_month_spk <- ggplot(data = spk_acc,
                         aes(x = month)) +
   geom_bar()+
@@ -1885,7 +1903,6 @@ gridExtra::grid.arrange(plot_month_spk, plot_day_spk,
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-
 plot_songkran_spk <- ggplot(data = spk_acc,
                         aes(x = reorder(songkran, songkran, function(x)-length(x)))) +
   geom_bar()+
@@ -2004,10 +2021,45 @@ Next, we will compute kernel density estimates of accidents over time using mult
 weight_bkk <- rep(1, nrow(bkk_acc))
 samples_bkk <- seq(0, max(bkk_acc$hour), 0.5)
 
+## Sanut Prakan
+weight_spk <- rep(1, nrow(spk_acc))
+samples_spk <- seq(0, max(spk_acc$hour), 0.5)
+```
+
+```{r}
+#| echo: false
+#| eval: false
 bw_bcv_bkk <- bw.bcv(bkk_acc$hour)
 bw_ucv_bkk <- bw.ucv(bkk_acc$hour)
 bw_SJ_bkk <- bw.SJ(bkk_acc$hour)
 
+bw_bcv_spk <- bw.bcv(spk_acc$hour)
+bw_ucv_spk <- bw.ucv(spk_acc$hour)
+bw_SJ_spk <- bw.SJ(spk_acc$hour)
+
+write_rds(bw_bcv_bkk, "data/rds/bw_bcv_bkk.rds")
+write_rds(bw_ucv_bkk, "data/rds/bw_ucv_bkk.rds")
+write_rds(bw_SJ_bkk, "data/rds/bw_SJ_bkk.rds")
+
+write_rds(bw_bcv_spk, "data/rds/bw_bcv_spk.rds")
+write_rds(bw_ucv_spk, "data/rds/bw_ucv_spk.rds")
+write_rds(bw_SJ_spk, "data/rds/bw_SJ_spk.rds")
+```
+
+```{r}
+#| echo: false
+bw_bcv_bkk <- read_rds("data/rds/bw_bcv_bkk.rds")
+bw_ucv_bkk <- read_rds("data/rds/bw_ucv_bkk.rds")
+bw_SJ_bkk <- read_rds("data/rds/bw_SJ_bkk.rds")
+
+bw_bcv_spk <- read_rds("data/rds/bw_bcv_spk.rds")
+bw_ucv_spk <- read_rds("data/rds/bw_ucv_spk.rds")
+bw_SJ_spk <- read_rds("data/rds/bw_SJ_spk.rds")
+```
+
+
+```{r}
+## Bangkok
 tk_bkk <- data.frame(
   bw_bcv = tkde(bkk_acc$hour, w = weight_bkk, samples = samples_bkk, bw = bw_bcv_bkk, kernel_name = "quartic"),
   bw_ucv = tkde(bkk_acc$hour, w = weight_bkk, samples = samples_bkk, bw = bw_ucv_bkk, kernel_name = "quartic"),
@@ -2019,13 +2071,6 @@ df_hour_bkk <- reshape2::melt(tk_bkk,
                           id.vars = "hour")
 
 ## Sanut Prakan
-weight_spk <- rep(1, nrow(spk_acc))
-samples_spk <- seq(0, max(spk_acc$hour), 0.5)
-
-bw_bcv_spk <- bw.bcv(spk_acc$hour)
-bw_ucv_spk <- bw.ucv(spk_acc$hour)
-bw_SJ_spk <- bw.SJ(spk_acc$hour)
-
 tk_spk <- data.frame(
   bw_bcv = tkde(spk_acc$hour, w = weight_spk, samples = samples_spk, bw = bw_bcv_spk, kernel_name = "quartic"),
   bw_ucv = tkde(spk_acc$hour, w = weight_spk, samples = samples_spk, bw = bw_ucv_spk, kernel_name = "quartic"),
@@ -2066,7 +2111,6 @@ plot_tk_bkk
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-
 plot_tk_spk <- ggplot(data = df_hour_spk,
                   aes(x = hour, y = value)) +
   geom_line()+
@@ -2103,6 +2147,7 @@ In the code chunk below, the following arguments are used: - *bws_net*: An order
 ## Bangkok
 
 ```{r}
+#| eval: false
 cv_bkk <- bw_tnkde_cv_likelihood_calc(
   bws_net = seq(100,1000,100),
   bws_time = seq(10,60,5),
@@ -2123,17 +2168,23 @@ cv_bkk <- bw_tnkde_cv_likelihood_calc(
   sub_sample=1,
   verbose = FALSE,
   check = TRUE)
+
+write_rds(cv_bkk, "data/rds/cv_bkk.rds")
 ```
 
 To visualise the output:
 
 ```{r}
+#| echo: false
+cv_bkk <- read_rds("data/rds/cv_bkk.rds")
+
 knitr::kable(cv_bkk)
 ```
 
 ## Samut Prakan
 
 ```{r}
+#| eval: false
 cv_spk <- bw_tnkde_cv_likelihood_calc(
   bws_net = seq(100,1000,100),
   bws_time = seq(10,60,5),
@@ -2154,11 +2205,17 @@ cv_spk <- bw_tnkde_cv_likelihood_calc(
   sub_sample=1,
   verbose = FALSE,
   check = TRUE)
+
+write_rds(cv_spk, "data/rds/cv_spk.rds")
+
 ```
 
 To visualise the output:
 
 ```{r}
+#| echo: false
+cv_spk <- read_rds("data/rds/cv_spk.rds")
+
 knitr::kable(cv_spk)
 ```
 :::
@@ -2204,10 +2261,12 @@ bkk_tnkde_densities <- tnkde(lines = bkk_network,
 
 ```{r}
 #| eval: false
+#| echo: false
 write_rds(bkk_tnkde_densities, "data/rds/bkk_tnkde_densities.rds")
 ```
 
 ```{r}
+#| echo: false
 bkk_tnkde_densities <- read_rds("data/rds/bkk_tnkde_densities.rds")
 ```
 
@@ -2219,7 +2278,6 @@ spk_sample_time <- seq(min(spk_acc$hour), max(spk_acc$hour), 1)
 
 ```{r}
 #| eval: false
-
 spk_tnkde_densities <- tnkde(lines = spk_network,
                    events = spk_acc,
                    time_field = "hour",
@@ -2240,10 +2298,12 @@ spk_tnkde_densities <- tnkde(lines = spk_network,
 
 ```{r}
 #| eval: false
+#| echo: false
 write_rds(spk_tnkde_densities, "data/rds/spk_tnkde_densities.rds")
 ```
 
 ```{r}
+#| echo: false
 spk_tnkde_densities <- read_rds("data/rds/spk_tnkde_densities.rds")
 ```
 :::
@@ -2254,6 +2314,8 @@ spk_tnkde_densities <- read_rds("data/rds/spk_tnkde_densities.rds")
 
 ```{r}
 #| eval: false
+#| code-fold: true
+#| code-summary: "Show the code"
 # Create a color palette for all the densities
 all_densities_bkk <- c(bkk_tnkde_densities$k)
 color_breaks_bkk <- classInt::classIntervals(all_densities_bkk, 
@@ -2302,6 +2364,8 @@ knitr::include_graphics("images/tnkde_bkk_3hr.gif")
 
 ```{r}
 #| eval: false
+#| code-fold: true
+#| code-summary: "Show the code"
 
 # Create a color palette for all the densities
 all_densities_spk <- c(spk_tnkde_densities$k)
@@ -2330,7 +2394,6 @@ tmap_animation(maps_spk, filename = "images/tnkde_spk.gif",
 
 ```{r}
 #| echo: false
-
 knitr::include_graphics("images/tnkde_spk.gif")
 ```
 
@@ -2338,7 +2401,6 @@ Using 3-hour intervals:
 
 ```{r}
 #| echo: false
-
 knitr::include_graphics("images/tnkde_spk_3hr.gif")
 ```
 
