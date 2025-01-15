@@ -57,6 +57,8 @@ website:
         text: "{{< fa house size=lg >}}"
       - href: about.qmd
         text: "{{< fa at size=lg >}}"
+      - href: "https://kylietjy.netlify.app/"
+        text: "{{< fa id-card size=lg >}}"      
 
       
 
